@@ -1,16 +1,8 @@
 import * as React from "react";
-import {
-  Frame,
-  House,
-  LayoutGrid,
-  Map,
-  PieChart,
-  Settings2,
-  Users,
-} from "lucide-react";
+import { House, LayoutGrid, Users } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
-import { NavProjects } from "@/components/nav-projects";
+import { NavWorkspaces } from "@/components/nav-workspaces";
 import { NavUser } from "@/components/nav-user";
 import {
   Sidebar,
@@ -46,27 +38,19 @@ const data = {
       url: "/tasks",
       icon: LayoutGrid,
     },
-    {
-      title: "Settings",
-      url: "/settings",
-      icon: Settings2,
-    },
   ],
   projects: [
     {
       name: "Design Engineering",
       url: "#",
-      icon: Frame,
     },
     {
       name: "Sales & Marketing",
       url: "#",
-      icon: PieChart,
     },
     {
       name: "Travel",
       url: "#",
-      icon: Map,
     },
   ],
 };
@@ -74,7 +58,7 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { theme } = useTheme();
   const logoSrc =
-    theme === "dark" ? "/LogoSimpleLight.svg" : "/LogoSimpleDark.svg";
+    theme === "light" ? "/LogoSimpleLight.svg" : "/LogoSimpleDark.svg";
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -99,7 +83,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <NavWorkspaces projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
         <ModeToggle />

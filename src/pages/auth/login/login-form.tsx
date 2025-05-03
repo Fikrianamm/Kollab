@@ -108,7 +108,7 @@ export function LoginForm() {
           Want to create your own team?{" "}
           <Link
             to="/auth/register"
-            className="hover:underline underline-offset-4"
+            className="hover:underline underline-offset-4 text-black dark:text-white"
           >
             Sign Up here as a leader.
           </Link>
