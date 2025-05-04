@@ -9,7 +9,7 @@ export const users: User[] = [
     username: "johndoe",
     email: "john.doe@example.com",
     password: "password",
-    avatar: "avatar_john.jpg",
+    avatar: "https://avatar.iran.liara.run/public/32",
     created_at: new Date("2025-02-15"),
   },
   {
@@ -19,7 +19,7 @@ export const users: User[] = [
     username: "janesmith",
     email: "jane.smith@example.com",
     password: "password",
-    avatar: "avatar_jane.jpg",
+    avatar: "https://avatar.iran.liara.run/public/58",
     created_at: new Date("2025-02-20"),
   },
   {
@@ -29,7 +29,7 @@ export const users: User[] = [
     username: "michaelj",
     email: "michael.johnson@example.com",
     password: "password",
-    avatar: "avatar_michael.jpg",
+    avatar: "https://avatar.iran.liara.run/public/37",
     created_at: new Date("2025-02-20"),
   }
 ];
