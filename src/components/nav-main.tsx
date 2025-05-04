@@ -8,7 +8,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 
 export function NavMain({
   items,
@@ -24,13 +24,19 @@ export function NavMain({
     }[];
   }[];
 }) {
+  const location = useLocation();
+  const pathLocation = location.pathname.toLocaleLowerCase();
   return (
     <SidebarGroup>
       <SidebarMenu>
         {items.map((item) => (
           <Link to={item.url} key={item.title}>
             <SidebarMenuItem>
-              <SidebarMenuButton tooltip={item.title}>
+              <SidebarMenuButton
+                tooltip={item.title}
+                isActive={pathLocation.includes(item.url)}
+                className="data-[active=true]:bg-blue-600 data-[active=true]:font-medium data-[active=true]:text-white transition-all"
+              >
                 {item.icon && <item.icon />}
                 <span>{item.title}</span>
               </SidebarMenuButton>

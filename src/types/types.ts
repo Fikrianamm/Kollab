@@ -3,10 +3,11 @@ export interface User {
   user_id: string;
   role: string; 
   name: string; 
-  username: string; 
+  username?: string; 
   email: string; 
-  password: string; 
+  password?: string; 
   avatar: string; 
+  created_at: Date;
 }
 
 // Team Interface
@@ -29,6 +30,7 @@ export interface Workspace {
   user_id: string;
   logo: string; 
   cover: string; 
+  title: string; 
 }
 
 // Task Interface

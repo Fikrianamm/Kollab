@@ -3,100 +3,96 @@ import { User, Team, Member, Workspace, Task, SubTask, Komentar } from '@/types/
 // User dummy data
 export const users: User[] = [
   {
-    user_id: "usr_123456789012345",
-    role: "admin",
+    user_id: "user_1",
+    role: "leader",
     name: "John Doe",
     username: "johndoe",
     email: "john.doe@example.com",
-    password: "hashed_password_here_123456789012345678901234567890",
-    avatar: "avatar_john.jpg"
+    password: "password",
+    avatar: "avatar_john.jpg",
+    created_at: new Date("2025-02-15"),
   },
   {
-    user_id: "usr_234567890123456",
-    role: "developer",
+    user_id: "user_2",
+    role: "member",
     name: "Jane Smith",
     username: "janesmith",
     email: "jane.smith@example.com",
-    password: "hashed_password_here_234567890123456789012345678901",
-    avatar: "avatar_jane.jpg"
+    password: "password",
+    avatar: "avatar_jane.jpg",
+    created_at: new Date("2025-02-20"),
   },
   {
-    user_id: "usr_345678901234567",
-    role: "manager",
+    user_id: "user_3",
+    role: "member",
     name: "Michael Johnson",
     username: "michaelj",
     email: "michael.johnson@example.com",
-    password: "hashed_password_here_345678901234567890123456789012",
-    avatar: "avatar_michael.jpg"
+    password: "password",
+    avatar: "avatar_michael.jpg",
+    created_at: new Date("2025-02-20"),
   }
 ];
 
 // Team dummy data
 export const teams: Team[] = [
   {
-    team_id: "team_12345",
-    user_id: "usr_123456789012345",
-    name: "Frontend Team"
+    team_id: "team_1",
+    user_id: "user_1",
+    name: "Koderra"
   },
-  {
-    team_id: "team_23456",
-    user_id: "usr_234567890123456",
-    name: "Backend Team"
-  },
-  {
-    team_id: "team_34567",
-    user_id: "usr_345678901234567",
-    name: "UI/UX Team"
-  }
 ];
 
 // Member dummy data
 export const members: Member[] = [
   {
-    member_id: "mem_12345",
-    user_id: "usr_123456789012345",
-    team_id: "team_23456"
+    member_id: "mem_1",
+    user_id: "user_1",
+    team_id: "team_1"
   },
   {
-    member_id: "mem_23456",
-    user_id: "usr_234567890123456",
-    team_id: "team_12345"
+    member_id: "mem_2",
+    user_id: "user_2",
+    team_id: "team_1"
   },
   {
-    member_id: "mem_34567",
-    user_id: "usr_345678901234567",
-    team_id: "team_34567"
+    member_id: "mem_3",
+    user_id: "user_3",
+    team_id: "team_1"
   }
 ];
 
 // Workspace dummy data
 export const workspaces: Workspace[] = [
   {
-    project_id: "proj_123456789",
-    user_id: "usr_123456789012345",
+    project_id: "proj_1",
+    user_id: "user_1",
     logo: "project_logo1.png",
-    cover: "project_cover1.jpg"
+    cover: "project_cover1.jpg",
+    title: "Educa"
   },
   {
-    project_id: "proj_234567890",
-    user_id: "usr_234567890123456",
+    project_id: "proj_2",
+    user_id: "user_1",
     logo: "project_logo2.png",
-    cover: "project_cover2.jpg"
+    cover: "project_cover2.jpg",
+    title: "Ecotreasures"
   },
   {
-    project_id: "proj_345678901",
-    user_id: "usr_345678901234567",
+    project_id: "proj_3",
+    user_id: "user_345678901234567",
     logo: "project_logo3.png",
-    cover: "project_cover3.jpg"
+    cover: "project_cover3.jpg",
+    title: "Kollab"
   }
 ];
 
 // Task dummy data
 export const tasks: Task[] = [
   {
-    task_id: "task_123456789012345678901234567",
-    project_id: "proj_123456789",
-    user_id: "usr_123456789012345",
+    task_id: "task_1",
+    project_id: "proj_1",
+    user_id: "user_2",
     title: "Implement Login Functionality",
     deadline: new Date("2025-06-15"),
     priority: "high",
@@ -104,9 +100,9 @@ export const tasks: Task[] = [
     description: "Create a secure login system with email verification and password recovery options. Implement JWT authentication and session management. Test with various user roles and edge cases."
   },
   {
-    task_id: "task_234567890123456789012345678",
-    project_id: "proj_123456789",
-    user_id: "usr_234567890123456",
+    task_id: "task_2",
+    project_id: "proj_2",
+    user_id: "user_3",
     title: "Design Dashboard UI",
     deadline: new Date("2025-05-20"),
     priority: "medium",
@@ -114,9 +110,9 @@ export const tasks: Task[] = [
     description: "Create a responsive dashboard interface with dark/light mode toggle. Include analytics charts, recent activity feed, and user notification panel."
   },
   {
-    task_id: "task_345678901234567890123456789",
-    project_id: "proj_234567890",
-    user_id: "usr_345678901234567",
+    task_id: "task_3",
+    project_id: "proj_2",
+    user_id: "user_3",
     title: "Setup Database Schema",
     deadline: new Date("2025-05-30"),
     priority: "high",
@@ -128,20 +124,20 @@ export const tasks: Task[] = [
 // SubTask dummy data
 export const subTasks: SubTask[] = [
   {
-    sub_task_id: "subtask_1234567890123456789012345678901",
-    task_id: "task_123456789012345678901234567",
+    sub_task_id: "subtask_1",
+    task_id: "task_1",
     is_complete: false,
     description: "Create API endpoints for authentication"
   },
   {
-    sub_task_id: "subtask_2345678901234567890123456789012",
-    task_id: "task_123456789012345678901234567",
+    sub_task_id: "subtask_2",
+    task_id: "task_2",
     is_complete: true,
     description: "Design login form UI"
   },
   {
-    sub_task_id: "subtask_3456789012345678901234567890123",
-    task_id: "task_234567890123456789012345678",
+    sub_task_id: "subtask_3",
+    task_id: "task_2",
     is_complete: true,
     description: "Create wireframes for dashboard layout"
   }
@@ -150,23 +146,23 @@ export const subTasks: SubTask[] = [
 // Komentar dummy data
 export const komentars: Komentar[] = [
   {
-    komentar_id: "com_12345678901234567",
-    task_id: "task_123456789012345678901234567",
-    user_id: "usr_234567890123456",
+    komentar_id: "com_1",
+    task_id: "task_1",
+    user_id: "user_2",
     comment: "I've started working on the authentication API. We should discuss the token expiration policy at our next meeting.",
     date: new Date("2025-05-01")
   },
   {
-    komentar_id: "com_23456789012345678",
-    task_id: "task_123456789012345678901234567",
-    user_id: "usr_345678901234567",
+    komentar_id: "com_2",
+    task_id: "task_1",
+    user_id: "user_3",
     comment: "Let's use JWT with a 7-day expiration and implement refresh tokens.",
     date: new Date("2025-05-02")
   },
   {
-    komentar_id: "com_34567890123456789",
-    task_id: "task_234567890123456789012345678",
-    user_id: "usr_123456789012345",
+    komentar_id: "com_3",
+    task_id: "task_2",
+    user_id: "user_1",
     comment: "The dashboard UI looks great! Can we add a notification center to the top bar?",
     date: new Date("2025-05-10")
   }
