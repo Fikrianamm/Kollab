@@ -19,6 +19,16 @@ import {
 } from "lucide-react";
 import { type LucideIcon } from "lucide-react";
 import { format } from "date-fns";
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
 
 function CardInfo(item: {
   icon: LucideIcon;
@@ -99,6 +109,57 @@ function TasksList({ tasks, priority }: { tasks: Task[]; priority: string }) {
   );
 }
 
+function ProductivityChart() {
+  const chartData = [
+    { month: "Desember", todo: 1, inProgress: 4, onReview: 5, done: 8 },
+    { month: "January", todo: 2, inProgress: 7, onReview: 2, done: 11 },
+    { month: "February", todo: 0, inProgress: 1, onReview: 7, done: 7 },
+    { month: "March", todo: 7, inProgress: 3, onReview: 2, done: 5 },
+    { month: "April", todo: 3, inProgress: 7, onReview: 2, done: 10 },
+    { month: "May", todo: 4, inProgress: 5, onReview: 1, done: 13 },
+  ];
+
+  const chartConfig = {
+    todo: {
+      label: "To Do",
+      color: "#ED3A3C",
+    },
+    inProgress: {
+      label: "In Progress",
+      color: "#4E3CEC",
+    },
+    onReview: {
+      label: "On Review",
+      color: "#ED7F3A",
+    },
+    done: {
+      label: "Done",
+      color: "#18AE2F",
+    },
+  } satisfies ChartConfig;
+
+  return (
+    <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+      <BarChart accessibilityLayer data={chartData}>
+        <CartesianGrid vertical={false} />
+        <XAxis
+          dataKey="month"
+          tickLine={false}
+          tickMargin={10}
+          axisLine={false}
+          tickFormatter={(value) => value.slice(0, 3)}
+        />
+        <ChartTooltip content={<ChartTooltipContent />} />
+        <ChartLegend verticalAlign="top" content={<ChartLegendContent />} />
+        <Bar dataKey="todo" fill="var(--color-todo)" radius={4} />
+        <Bar dataKey="inProgress" fill="var(--color-inProgress)" radius={4} />
+        <Bar dataKey="onReview" fill="var(--color-onReview)" radius={4} />
+        <Bar dataKey="done" fill="var(--color-done)" radius={4} />
+      </BarChart>
+    </ChartContainer>
+  );
+}
+
 export default function DashboardPage() {
   const tasksUrgent: Task[] = [];
   const tasksHigh: Task[] = [];
@@ -141,7 +202,7 @@ export default function DashboardPage() {
           </Breadcrumb>
         </div>
       </header>
-      <div className="flex flex-1 flex-col gap-4 py-4 px-4 lg:px-8 pt-0">
+      <div className="flex flex-1 flex-col gap-4 pb-28 px-4 lg:px-8 pt-0">
         <div>
           <h2 className="md:text-[32px] text-2xl font-semibold">Dashboard</h2>
           <p className="text-sm md:text-xl text-muted-foreground">
@@ -175,7 +236,14 @@ export default function DashboardPage() {
                 count={11}
                 className="bg-blue-600/10 text-blue-600 border-blue-600"
               />
-              <div className="border-border border rounded-md h-100 col-span-2 bg-black" />
+              <Card className="rounded-md col-span-2 bg-transparent">
+                <CardTitle className="text-center md:text-xl">
+                  Productivity Chart
+                </CardTitle>
+                <CardContent>
+                  <ProductivityChart />
+                </CardContent>
+              </Card>
             </div>
           </div>
           <div className="border-border border rounded-md order-0 md:order-last col-span-2 md:col-span-1 p-4">
