@@ -34,7 +34,7 @@ const data = {
       icon: Users,
     },
     {
-      title: "My Tasks",
+      title: "Tasks",
       url: "/tasks",
       icon: LayoutGrid,
     },
