@@ -93,6 +93,12 @@ export const columns: ColumnDef<Task>[] = [
     ),
   },
   {
+    accessorKey: "project_id",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Workspace" />
+    ),
+  },
+  {
     accessorKey: "priority",
     header: "Priority",
     cell: ({ row }) => {

@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { tasks } from "@/dummy/data";
+import { tasks, users, workspaces } from "@/dummy/data";
 
 import React from "react";
 import {
@@ -20,7 +20,12 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { ChevronDown, CirclePlus } from "lucide-react";
+import {
+  BriefcaseBusiness,
+  ChevronDown,
+  CirclePlus,
+  Users,
+} from "lucide-react";
 import { useNavigate } from "react-router";
 import { Input } from "@/components/ui/input";
 import { Button } from "../../components/ui/button";
@@ -28,6 +33,8 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu";
 import {
@@ -40,6 +47,10 @@ import {
 } from "../../components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { columns } from "./columns";
+import {
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@radix-ui/react-dropdown-menu";
 
 export default function TaskssPage() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -67,6 +78,23 @@ export default function TaskssPage() {
       columnVisibility,
     },
   });
+
+  // Filter handlers
+  const handleAssigneeFilter = (value: string) => {
+    if (value === "all") {
+      table.getColumn("user_id")?.setFilterValue(undefined);
+    } else {
+      table.getColumn("user_id")?.setFilterValue(value);
+    }
+  };
+
+  const handleWorkspaceFilter = (value: string) => {
+    if (value === "all") {
+      table.getColumn("project_id")?.setFilterValue(undefined);
+    } else {
+      table.getColumn("project_id")?.setFilterValue(value);
+    }
+  };
 
   return (
     <SidebarInset>
@@ -102,11 +130,79 @@ export default function TaskssPage() {
               }
               className="md:max-w-sm w-full"
             />
-            <div className="flex gap-2 w-full justify-end">
+            <div className="flex gap-2 w-full justify-end flex-wrap">
+              {/* Assigned To Filter */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="flex gap-2">
+                    <Users size={16} />
+                    <span>Assignee</span>
+                    <ChevronDown size={16} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuLabel>Filter by Assignee</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuRadioGroup
+                    onValueChange={handleAssigneeFilter}
+                    value={
+                      (table
+                        .getColumn("user_id")
+                        ?.getFilterValue() as string) ?? "all"
+                    }
+                  >
+                    <DropdownMenuRadioItem value="all">
+                      All Assignees
+                    </DropdownMenuRadioItem>
+                    {users.map((assignee) => (
+                      <DropdownMenuRadioItem
+                        key={assignee.user_id}
+                        value={assignee.user_id}
+                      >
+                        {assignee.name}
+                      </DropdownMenuRadioItem>
+                    ))}
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Workspace Filter */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="flex gap-2">
+                    <BriefcaseBusiness size={16} />
+                    <span>Workspace</span>
+                    <ChevronDown size={16} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuLabel>Filter by Workspace</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuRadioGroup
+                    onValueChange={handleWorkspaceFilter}
+                    value={
+                      (table
+                        .getColumn("project_id")
+                        ?.getFilterValue() as string) ?? "all"
+                    }
+                  >
+                    <DropdownMenuRadioItem value="all">
+                      All Workspaces
+                    </DropdownMenuRadioItem>
+                    {workspaces.map((workspace) => (
+                      <DropdownMenuRadioItem
+                        key={workspace.project_id}
+                        value={workspace.project_id}
+                      >
+                        {workspace.title}
+                      </DropdownMenuRadioItem>
+                    ))}
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <Button
                 variant="blue"
                 onClick={() => navigate("/invoice/create")}
-                className="flex-1 md:flex-none"
               >
                 <CirclePlus size={16} />
                 <span>Create</span>

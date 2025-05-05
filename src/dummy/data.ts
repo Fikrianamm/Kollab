@@ -123,7 +123,7 @@ export const tasks: Task[] = [
   },
   {
     task_id: "task_3",
-    project_id: "proj_2",
+    project_id: "proj_1",
     user_id: "user_3",
     title: "Setup Database Schema",
     deadline: new Date("2025-05-30"),
@@ -147,7 +147,7 @@ export const tasks: Task[] = [
   },
   {
     task_id: "task_5",
-    project_id: "proj_2",
+    project_id: "proj_1",
     user_id: "user_3",
     title: "Design Dashboard UI",
     deadline: new Date("2025-05-20"),
