@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/sidebar";
 import { ModeToggle } from "./mode-toggle";
 import { useTheme } from "./theme-provider";
+import { workspaces } from "@/dummy/data";
 
 // This is sample data.
 const data = {
@@ -39,26 +40,19 @@ const data = {
       icon: LayoutGrid,
     },
   ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-    },
-    {
-      name: "Travel",
-      url: "#",
-    },
-  ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { theme } = useTheme();
   const logoSrc =
     theme === "light" ? "/LogoSimpleLight.svg" : "/LogoSimpleDark.svg";
+
+  const projects = workspaces.map((workspace) => {
+    return {
+      name: workspace.title,
+      url: `/workspaces/${workspace.project_id}`,
+    };
+  });
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -83,7 +77,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavWorkspaces projects={data.projects} />
+        <NavWorkspaces projects={projects} />
       </SidebarContent>
       <SidebarFooter>
         <ModeToggle />

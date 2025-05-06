@@ -24,6 +24,7 @@ const buttonVariants = cva(
         white:
           "border border-input bg-background text-primaryDark hover:bg-background/90 transition-all",
         blue: "bg-blue-600 text-white hover:bg-blue-600/90 transition-all",
+        transparent: "bg-transparent text-foreground hover:bg-accent/50",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

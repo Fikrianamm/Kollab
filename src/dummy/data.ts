@@ -57,16 +57,61 @@ export const members: Member[] = [
     member_id: "mem_1",
     user_id: "user_1",
     team_id: "team_1",
+    user: {
+      user_id: "user_1",
+      role: "leader",
+      name: "John Doe",
+      username: "johndoe",
+      email: "john.doe@example.com",
+      password: "password",
+      avatar: "https://avatar.iran.liara.run/public/32",
+      created_at: new Date("2025-02-15"),
+    },
+    team: {
+      team_id: "team_1",
+      user_id: "user_1",
+      name: "Koderra",
+    },
   },
   {
     member_id: "mem_2",
     user_id: "user_2",
     team_id: "team_1",
+    user: {
+      user_id: "user_2",
+      role: "member",
+      name: "Jane Smith",
+      username: "janesmith",
+      email: "jane.smith@example.com",
+      password: "password",
+      avatar: "https://avatar.iran.liara.run/public/58",
+      created_at: new Date("2025-02-20"),
+    },
+    team: {
+      team_id: "team_1",
+      user_id: "user_1",
+      name: "Koderra",
+    },
   },
   {
     member_id: "mem_3",
     user_id: "user_3",
     team_id: "team_1",
+    user: {
+      user_id: "user_3",
+      role: "member",
+      name: "Michael Johnson",
+      username: "michaelj",
+      email: "michael.johnson@example.com",
+      password: "password",
+      avatar: "https://avatar.iran.liara.run/public/37",
+      created_at: new Date("2025-02-20"),
+    },
+    team: {
+      team_id: "team_1",
+      user_id: "user_1",
+      name: "Koderra",
+    },
   },
 ];
 
@@ -78,6 +123,16 @@ export const workspaces: Workspace[] = [
     logo: "project_logo1.png",
     cover: "project_cover1.jpg",
     title: "Educa",
+    user: {
+      user_id: "user_1",
+      role: "leader",
+      name: "John Doe",
+      username: "johndoe",
+      email: "john.doe@example.com",
+      password: "password",
+      avatar: "https://avatar.iran.liara.run/public/32",
+      created_at: new Date("2025-02-15"),
+    },
   },
   {
     project_id: "proj_2",
@@ -85,13 +140,33 @@ export const workspaces: Workspace[] = [
     logo: "project_logo2.png",
     cover: "project_cover2.jpg",
     title: "Ecotreasures",
+    user: {
+      user_id: "user_1",
+      role: "leader",
+      name: "John Doe",
+      username: "johndoe",
+      email: "john.doe@example.com",
+      password: "password",
+      avatar: "https://avatar.iran.liara.run/public/32",
+      created_at: new Date("2025-02-15"),
+    },
   },
   {
     project_id: "proj_3",
-    user_id: "user_345678901234567",
+    user_id: "user_1",
     logo: "project_logo3.png",
     cover: "project_cover3.jpg",
     title: "Kollab",
+    user: {
+      user_id: "user_1",
+      role: "leader",
+      name: "John Doe",
+      username: "johndoe",
+      email: "john.doe@example.com",
+      password: "password",
+      avatar: "https://avatar.iran.liara.run/public/32",
+      created_at: new Date("2025-02-15"),
+    },
   },
 ];
 
@@ -108,6 +183,49 @@ export const tasks: Task[] = [
     description:
       "Create a secure login system with email verification and password recovery options. Implement JWT authentication and session management. Test with various user roles and edge cases.",
     created_at: new Date("2025-05-01"),
+    project: {
+      project_id: "proj_1",
+      user_id: "user_1",
+      logo: "project_logo1.png",
+      cover: "project_cover1.jpg",
+      title: "Educa",
+    },
+    user: {
+      user_id: "user_2",
+      role: "member",
+      name: "Jane Smith",
+      username: "janesmith",
+      email: "jane.smith@example.com",
+      password: "password",
+      avatar: "https://avatar.iran.liara.run/public/58",
+      created_at: new Date("2025-02-20"),
+    },
+    sub_tasks: [
+      {
+        sub_task_id: "subtask_1",
+        task_id: "task_1",
+        is_complete: false,
+        description: "Create API endpoints for authentication",
+      },
+    ],
+    komentars: [
+      {
+        komentar_id: "com_1",
+        task_id: "task_1",
+        user_id: "user_2",
+        comment:
+          "I've started working on the authentication API. We should discuss the token expiration policy at our next meeting.",
+        date: new Date("2025-05-01"),
+      },
+      {
+        komentar_id: "com_2",
+        task_id: "task_1",
+        user_id: "user_3",
+        comment:
+          "Let's use JWT with a 7-day expiration and implement refresh tokens.",
+        date: new Date("2025-05-02"),
+      },
+    ],
   },
   {
     task_id: "task_2",
@@ -120,6 +238,47 @@ export const tasks: Task[] = [
     description:
       "Create a responsive dashboard interface with dark/light mode toggle. Include analytics charts, recent activity feed, and user notification panel.",
     created_at: new Date("2025-05-01"),
+    project: {
+      project_id: "proj_2",
+      user_id: "user_1",
+      logo: "project_logo2.png",
+      cover: "project_cover2.jpg",
+      title: "Ecotreasures",
+    },
+    user: {
+      user_id: "user_3",
+      role: "member",
+      name: "Michael Johnson",
+      username: "michaelj",
+      email: "michael.johnson@example.com",
+      password: "password",
+      avatar: "https://avatar.iran.liara.run/public/37",
+      created_at: new Date("2025-02-20"),
+    },
+    sub_tasks: [
+      {
+        sub_task_id: "subtask_2",
+        task_id: "task_2",
+        is_complete: true,
+        description: "Design login form UI",
+      },
+      {
+        sub_task_id: "subtask_3",
+        task_id: "task_2",
+        is_complete: true,
+        description: "Create wireframes for dashboard layout",
+      },
+    ],
+    komentars: [
+      {
+        komentar_id: "com_3",
+        task_id: "task_2",
+        user_id: "user_1",
+        comment:
+          "The dashboard UI looks great! Can we add a notification center to the top bar?",
+        date: new Date("2025-05-10"),
+      },
+    ],
   },
   {
     task_id: "task_3",
@@ -132,6 +291,23 @@ export const tasks: Task[] = [
     description:
       "Design and implement the database schema for the new project management system. Include tables for users, projects, tasks, and comments with appropriate relationships and constraints.",
     created_at: new Date("2025-05-01"),
+    project: {
+      project_id: "proj_1",
+      user_id: "user_1",
+      logo: "project_logo1.png",
+      cover: "project_cover1.jpg",
+      title: "Educa",
+    },
+    user: {
+      user_id: "user_3",
+      role: "member",
+      name: "Michael Johnson",
+      username: "michaelj",
+      email: "michael.johnson@example.com",
+      password: "password",
+      avatar: "https://avatar.iran.liara.run/public/37",
+      created_at: new Date("2025-02-20"),
+    },
   },
   {
     task_id: "task_4",
@@ -144,6 +320,23 @@ export const tasks: Task[] = [
     description:
       "Create a secure login system with email verification and password recovery options. Implement JWT authentication and session management. Test with various user roles and edge cases.",
     created_at: new Date("2025-05-01"),
+    project: {
+      project_id: "proj_1",
+      user_id: "user_1",
+      logo: "project_logo1.png",
+      cover: "project_cover1.jpg",
+      title: "Educa",
+    },
+    user: {
+      user_id: "user_2",
+      role: "member",
+      name: "Jane Smith",
+      username: "janesmith",
+      email: "jane.smith@example.com",
+      password: "password",
+      avatar: "https://avatar.iran.liara.run/public/58",
+      created_at: new Date("2025-02-20"),
+    },
   },
   {
     task_id: "task_5",
@@ -156,6 +349,23 @@ export const tasks: Task[] = [
     description:
       "Create a responsive dashboard interface with dark/light mode toggle. Include analytics charts, recent activity feed, and user notification panel.",
     created_at: new Date("2025-05-01"),
+    project: {
+      project_id: "proj_1",
+      user_id: "user_1",
+      logo: "project_logo1.png",
+      cover: "project_cover1.jpg",
+      title: "Educa",
+    },
+    user: {
+      user_id: "user_3",
+      role: "member",
+      name: "Michael Johnson",
+      username: "michaelj",
+      email: "michael.johnson@example.com",
+      password: "password",
+      avatar: "https://avatar.iran.liara.run/public/37",
+      created_at: new Date("2025-02-20"),
+    },
   },
   {
     task_id: "task_6",
@@ -168,6 +378,23 @@ export const tasks: Task[] = [
     description:
       "Design and implement the database schema for the new project management system. Include tables for users, projects, tasks, and comments with appropriate relationships and constraints.",
     created_at: new Date("2025-05-01"),
+    project: {
+      project_id: "proj_2",
+      user_id: "user_1",
+      logo: "project_logo2.png",
+      cover: "project_cover2.jpg",
+      title: "Ecotreasures",
+    },
+    user: {
+      user_id: "user_3",
+      role: "member",
+      name: "Michael Johnson",
+      username: "michaelj",
+      email: "michael.johnson@example.com",
+      password: "password",
+      avatar: "https://avatar.iran.liara.run/public/37",
+      created_at: new Date("2025-02-20"),
+    },
   },
 ];
 

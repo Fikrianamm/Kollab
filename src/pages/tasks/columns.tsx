@@ -93,7 +93,7 @@ export const columns: ColumnDef<Task>[] = [
     ),
   },
   {
-    accessorKey: "project_id",
+    accessorKey: "project.title",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Workspace" />
     ),
@@ -113,7 +113,7 @@ export const columns: ColumnDef<Task>[] = [
     },
   },
   {
-    accessorKey: "user_id",
+    accessorKey: "user.name",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Assigned To" />
     ),

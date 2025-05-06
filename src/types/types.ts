@@ -1,3 +1,4 @@
+import { komentars } from './../dummy/data';
 // User Interface
 export interface User {
   user_id: string;
@@ -22,6 +23,8 @@ export interface Member {
   member_id: string;
   user_id: string;
   team_id: string;
+  user?: User;
+  team?: Team;
 }
 
 // Workspace Interface
@@ -31,6 +34,7 @@ export interface Workspace {
   logo: string;
   cover: string;
   title: string;
+  user?: User;
 }
 
 // Task Interface
@@ -44,6 +48,10 @@ export interface Task {
   status: string;
   description: string;
   created_at: Date;
+  project?: Workspace;
+  user?: User;
+  sub_tasks?: SubTask[];
+  komentars?: Komentar[];
 }
 
 // SubTask Interface

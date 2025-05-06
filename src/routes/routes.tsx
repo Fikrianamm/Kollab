@@ -8,6 +8,7 @@ import DashboardPage from "@/pages/dashboard/Page";
 import LandingPage from "@/pages/LandingPage";
 import PeoplesPage from "@/pages/people/Page";
 import TasksPage from "@/pages/tasks/Page";
+import WorkspacePage from "@/pages/workspace/Page";
 import { createBrowserRouter } from "react-router";
 
 const router = createBrowserRouter([
@@ -33,6 +34,7 @@ const router = createBrowserRouter([
               { path: "dashboard", element: <DashboardPage /> },
               { path: "peoples", element: <PeoplesPage /> },
               { path: "tasks", element: <TasksPage /> },
+              { path: "/workspaces/:id", element: <WorkspacePage /> },
             ],
           },
         ],
