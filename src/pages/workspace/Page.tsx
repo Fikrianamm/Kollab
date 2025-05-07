@@ -24,34 +24,46 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { COLUMNS, INITIAL_TASKS } from "@/constants/taskConstants";
+import { INITIAL_TASKS } from "@/constants/taskConstants";
 import { workspaces } from "@/dummy/data";
 import { MoreHorizontal, PenLine, Plus, Trash2 } from "lucide-react";
 import { Link, useParams } from "react-router";
+import {
+  DndContext,
+  DragEndEvent,
+  DragStartEvent,
+  useDroppable,
+  DragOverEvent,
+  KeyboardSensor,
+  PointerSensor,
+  UniqueIdentifier,
+  closestCorners,
+  useSensor,
+  useSensors,
+  DragOverlay,
+} from "@dnd-kit/core";
+import { useState } from "react";
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 type TaskStatus = "TODO" | "IN_PROGRESS" | "ON_REVIEW" | "DONE";
 
-export interface ITask {
+export interface Task {
   id: string;
   status: TaskStatus;
   title: string;
   description: string;
 }
 
-export interface IColumn {
+export interface Container {
   id: TaskStatus;
   title: string;
-}
-
-interface ColumnProps {
-  column: IColumn;
-  tasks: ITask[];
-  key?: string;
-}
-
-interface TaskCardProps {
-  task: ITask;
-  key?: string;
+  tasks: Task[];
 }
 
 function WorkspaceActions() {
@@ -103,45 +115,256 @@ function WorkspaceActions() {
   );
 }
 
-function WorkspaceColumn(props: ColumnProps) {
-  const { column, tasks, key } = props;
-  return (
-    <div key={key} className="flex flex-1 flex-col">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="font-semibold text-muted-foreground">{column.title}</h2>
-        <Plus
-          className="text-muted-foreground hover:text-foreground"
-          size={20}
-        />
-      </div>
-      <div className="flex flex-col flex-1 gap-4">
-        {tasks.map((task) => (
-          <TaskCard key={task.id} task={task} />
-        ))}
-      </div>
-    </div>
-  );
-}
+function SortableItem({ id, task }: { id: UniqueIdentifier; task: Task }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id,
+  });
 
-function TaskCard(props: TaskCardProps) {
-  const { task, key } = props;
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
   return (
-    <div
-      key={key}
-      className="cursor-grab rounded-md border border-border hover:border-blue-600 p-4 shadow-sm hover:shadow-md"
+    <li
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      className={`cursor-grab active:cursor-grabbing touch-none rounded-md border border-border hover:border-blue-600 p-4 shadow-sm hover:shadow-md bg-background ${
+        isDragging ? "z-10 opacity-50 shadow-md" : ""
+      }`}
+      style={style}
     >
       <div className="flex justify-between items-center">
         <h3 className="font-medium text-foreground">{task.title}</h3>
         <MoreHorizontal size={16} />
       </div>
       <p className="mt-2 text-sm text-muted-foreground">{task.description}</p>
+    </li>
+  );
+}
+
+function DroppableContainer({
+  id,
+  title,
+  tasks,
+}: {
+  id: string;
+  title: string;
+  tasks: Task[];
+}) {
+  const { setNodeRef } = useDroppable({
+    id,
+  });
+  return (
+    <div ref={setNodeRef} className="flex flex-col">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="font-semibold text-muted-foreground">{title}</h2>
+        <Plus
+          className="text-muted-foreground hover:text-foreground"
+          size={20}
+        />
+      </div>
+      <div className="flex-1">
+        <SortableContext
+          items={tasks.map((item) => item.id)}
+          strategy={verticalListSortingStrategy}
+        >
+          <ul className="flex flex-col gap-4">
+            {tasks.map((task) => (
+              <SortableItem key={task.id} task={task} id={task.id} />
+            ))}
+          </ul>
+        </SortableContext>
+      </div>
+    </div>
+  );
+}
+
+function ItemOverlay({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) {
+  return (
+    <div
+      className={`cursor-grab active:cursor-grabbing touch-none rounded-md border border-border hover:border-blue-600 p-4 shadow-sm hover:shadow-md bg-background`}
+    >
+      <div className="flex justify-between items-center">
+        <h3 className="font-medium text-foreground">{title}</h3>
+        <MoreHorizontal size={16} />
+      </div>
+      <p className="mt-2 text-sm text-muted-foreground">{description}</p>
     </div>
   );
 }
 
 export default function WorkspacePage() {
   const { id } = useParams();
+  const [containers, setContainers] = useState<Container[]>(INITIAL_TASKS);
+  void setContainers;
+
   const workspace = workspaces.find((workspace) => workspace.project_id === id);
+  // const [tasks, setTasks] = useState<ITask[]>([...INITIAL_TASKS]);
+  const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
+  void activeId;
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor)
+  );
+
+  function findContainerId(
+    itemId: UniqueIdentifier
+  ): UniqueIdentifier | undefined {
+    if (containers.some((container) => container.id === itemId)) {
+      return itemId;
+    }
+    return containers.find((container) =>
+      container.tasks.some((item) => item.id === itemId)
+    )?.id;
+  }
+
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id);
+  };
+
+  const handleDragOver = (event: DragOverEvent) => {
+    const { active, over } = event;
+
+    if (!over) {
+      return;
+    }
+
+    const activeId = active.id;
+    const overId = over.id;
+
+    const activeContainerId = findContainerId(activeId);
+    const overContainerId = findContainerId(overId);
+
+    if (!activeContainerId || !overContainerId) {
+      return;
+    }
+
+    if (activeContainerId === overContainerId && activeId !== overId) {
+      return;
+    }
+
+    if (activeContainerId === overContainerId) return;
+
+    setContainers((prev) => {
+      const activeContainer = prev.find((c) => c.id === activeContainerId);
+      if (!activeContainer) return prev;
+
+      const activeItem = activeContainer.tasks.find(
+        (item) => item.id === activeId
+      );
+
+      if (!activeItem) return prev;
+
+      const newContainers = prev.map((container) => {
+        if (container.id === activeContainerId) {
+          return {
+            ...container,
+            tasks: container.tasks.filter((item) => item.id !== activeId),
+          };
+        }
+
+        if (container.id === overContainerId) {
+          if (overId === overContainerId) {
+            return {
+              ...container,
+              tasks: [...container.tasks, activeItem],
+            };
+          }
+          const overItemIndex = container.tasks.findIndex(
+            (item) => item.id === overId
+          );
+          if (overItemIndex !== -1) {
+            return {
+              ...container,
+              tasks: [
+                ...container.tasks.slice(0, overItemIndex + 1),
+                activeItem,
+                ...container.tasks.slice(overItemIndex + 1),
+              ],
+            };
+          }
+        }
+
+        return container;
+      });
+      return newContainers;
+    });
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over) {
+      setActiveId(null);
+      return;
+    }
+
+    const activeContainerId = findContainerId(active.id);
+    const overContainerId = findContainerId(over.id);
+
+    if (!activeContainerId || !overContainerId) {
+      setActiveId(null);
+      return;
+    }
+
+    if (activeContainerId === overContainerId && active.id !== over.id) {
+      const containerIndex = containers.findIndex(
+        (c) => c.id === activeContainerId
+      );
+
+      if (containerIndex === -1) {
+        setActiveId(null);
+        return;
+      }
+
+      const container = containers[containerIndex];
+      const activeIndex = container.tasks.findIndex(
+        (item) => item.id === active.id
+      );
+      const overIndex = container.tasks.findIndex(
+        (item) => item.id === over.id
+      );
+
+      if (activeIndex !== -1 && overIndex !== -1) {
+        const newItems = arrayMove(container.tasks, activeIndex, overIndex);
+
+        setContainers((containers) => {
+          return containers.map((c, i) => {
+            if (i === containerIndex) {
+              return { ...c, tasks: newItems };
+            }
+            return c;
+          });
+        });
+      }
+    }
+    setActiveId(null);
+  };
+
+  function getActiveItem () {
+    for (const container of containers) {
+      const item = container.tasks.find((item) => item.id === activeId);
+      if (item) return item;
+    }
+    return null;
+  }
+
   return (
     <SidebarInset>
       <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
@@ -187,17 +410,37 @@ export default function WorkspacePage() {
           </div>
         </div>
         <div className="max-w-dvw overflow-x-auto">
-          <div className="grid grid-cols-4 gap-4">
-            {COLUMNS.map((column) => (
-              <WorkspaceColumn
-                key={column.id}
-                column={column}
-                tasks={INITIAL_TASKS.filter(
-                  (task) => task.status === column.id
-                )}
-              />
-            ))}
-          </div>
+          <DndContext
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+            onDragOver={handleDragOver}
+            collisionDetection={closestCorners}
+            sensors={sensors}
+          >
+            <div className="grid grid-cols-4 gap-4">
+              {containers.map((container) => (
+                <DroppableContainer
+                  key={container.id}
+                  id={container.id}
+                  title={container.title}
+                  tasks={container.tasks}
+                />
+              ))}
+            </div>
+            <DragOverlay
+            dropAnimation={{
+              duration:150,
+              easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
+            }}
+            >
+              {activeId ? (
+                <ItemOverlay
+                  title={getActiveItem()?.title as string}
+                  description={getActiveItem()?.description as string}
+                />
+              ) : null}
+            </DragOverlay>
+          </DndContext>
         </div>
       </div>
     </SidebarInset>

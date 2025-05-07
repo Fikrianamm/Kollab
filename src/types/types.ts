@@ -1,4 +1,3 @@
-import { komentars } from './../dummy/data';
 // User Interface
 export interface User {
   user_id: string;
