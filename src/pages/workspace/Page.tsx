@@ -164,7 +164,7 @@ function DroppableContainer({
     id,
   });
   return (
-    <div ref={setNodeRef} className="flex flex-col">
+    <div ref={setNodeRef} className="flex flex-col min-w-[280px]">
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-semibold text-muted-foreground">{title}</h2>
         <Plus
@@ -357,7 +357,7 @@ export default function WorkspacePage() {
     setActiveId(null);
   };
 
-  function getActiveItem () {
+  function getActiveItem() {
     for (const container of containers) {
       const item = container.tasks.find((item) => item.id === activeId);
       if (item) return item;
@@ -409,7 +409,7 @@ export default function WorkspacePage() {
             </div>
           </div>
         </div>
-        <div className="max-w-dvw overflow-x-auto">
+        <div className="overflow-x-auto pb-6">
           <DndContext
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
@@ -417,7 +417,7 @@ export default function WorkspacePage() {
             collisionDetection={closestCorners}
             sensors={sensors}
           >
-            <div className="grid grid-cols-4 gap-4">
+            <div className="flex gap-4 min-w-max">
               {containers.map((container) => (
                 <DroppableContainer
                   key={container.id}
@@ -428,10 +428,10 @@ export default function WorkspacePage() {
               ))}
             </div>
             <DragOverlay
-            dropAnimation={{
-              duration:150,
-              easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
-            }}
+              dropAnimation={{
+                duration: 150,
+                easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)",
+              }}
             >
               {activeId ? (
                 <ItemOverlay
