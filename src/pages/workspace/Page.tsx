@@ -80,7 +80,7 @@ function WorkspaceActions() {
           <Link to={`/workspaces/edit/`}>
             <DropdownMenuItem>
               <PenLine />
-              Edit
+              Setting
             </DropdownMenuItem>
           </Link>
           <DropdownMenuSeparator />
@@ -164,7 +164,7 @@ function DroppableContainer({
     id,
   });
   return (
-    <div ref={setNodeRef} className="flex flex-col min-w-[280px]">
+    <div ref={setNodeRef} className="flex flex-col w-full">
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-semibold text-muted-foreground">{title}</h2>
         <Plus
@@ -417,7 +417,7 @@ export default function WorkspacePage() {
             collisionDetection={closestCorners}
             sensors={sensors}
           >
-            <div className="flex gap-4 min-w-max">
+            <div className="flex gap-4 min-w-max md:min-w-0 w-full">
               {containers.map((container) => (
                 <DroppableContainer
                   key={container.id}
