@@ -30,6 +30,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "./ui/button";
+import { Link } from "react-router";
 
 export function NavUser({
   user,
@@ -49,7 +50,8 @@ export function NavUser({
         <DialogHeader>
           <DialogTitle>Confirmation logout</DialogTitle>
           <DialogDescription>
-            Anyone who has this link will be able to view this.
+            Are you sure you want to log out of your account? Your session will
+            expire.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="sm:justify-end">
@@ -101,10 +103,12 @@ export function NavUser({
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuGroup>
-                <DropdownMenuItem>
-                  <Settings2 />
-                  Settings
-                </DropdownMenuItem>
+                <Link to={"/settings"}>
+                  <DropdownMenuItem>
+                    <Settings2 />
+                    Settings
+                  </DropdownMenuItem>
+                </Link>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DialogTrigger asChild>

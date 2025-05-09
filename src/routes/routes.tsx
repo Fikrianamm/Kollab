@@ -7,6 +7,7 @@ import RegisterPage from "@/pages/auth/register/Page";
 import DashboardPage from "@/pages/dashboard/Page";
 import LandingPage from "@/pages/LandingPage";
 import PeoplesPage from "@/pages/people/Page";
+import SettingPage from "@/pages/settings/Page";
 import TasksPage from "@/pages/tasks/Page";
 import WorkspacePage from "@/pages/workspace/Page";
 import { createBrowserRouter } from "react-router";
@@ -31,6 +32,7 @@ const router = createBrowserRouter([
           {
             element: <SidebarLayout />,
             children: [
+              { path: "settings", element: <SettingPage /> },
               { path: "dashboard", element: <DashboardPage /> },
               { path: "peoples", element: <PeoplesPage /> },
               { path: "tasks", element: <TasksPage /> },
