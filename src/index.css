@@ -161,3 +161,28 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* style quill text editor */
+.ql-editor {
+  background-color: var(--background); 
+  border-radius: 0 0 4px 4px !important;
+  border-top: 0;
+}
+
+.ql-toolbar {
+  background-color: transparent; 
+  border: 1px solid var(--border) !important;
+  border-radius: 4px 4px 0 0;
+  border-bottom: 0;
+}
+
+.ql-container.ql-snow {
+  border: 1px solid var(--border) !important;
+  border-radius: 0 0 4px 4px !important;
+  background-color: transparent;
+}
+
+.ql-editor.ql-blank::before {
+  color: var(--muted-foreground) !important;
+  font-style: normal !important;
+}

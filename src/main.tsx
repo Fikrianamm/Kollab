@@ -4,6 +4,8 @@ import "./index.css";
 import { RouterProvider } from "react-router";
 import router from "./routes/routes";
 import { Toaster } from "./components/ui/toaster";
+import 'react-quill-new/dist/quill.snow.css';
+import 'react-quill-new/dist/quill.bubble.css';
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

@@ -68,4 +68,8 @@ export interface Komentar {
   user_id: string;
   comment: string;
   date: Date;
+  user: User;
 }
+
+export type PriorityType = "urgent" | "high" | "medium" | "low" | "unknown";
+export type StatusType = "in progress" | "on review" | "done" | "to do";

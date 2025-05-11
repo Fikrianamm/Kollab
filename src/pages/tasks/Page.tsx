@@ -52,7 +52,7 @@ import {
   DropdownMenuSeparator,
 } from "@radix-ui/react-dropdown-menu";
 
-export default function TaskssPage() {
+export default function TasksPage() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []

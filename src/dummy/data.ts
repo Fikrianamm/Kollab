@@ -182,7 +182,7 @@ export const tasks: Task[] = [
     status: "in progress",
     description:
       "Create a secure login system with email verification and password recovery options. Implement JWT authentication and session management. Test with various user roles and edge cases.",
-    created_at: new Date("2025-05-01"),
+    created_at: new Date("2025-05-10"),
     project: {
       project_id: "proj_1",
       user_id: "user_1",
@@ -216,6 +216,16 @@ export const tasks: Task[] = [
         comment:
           "I've started working on the authentication API. We should discuss the token expiration policy at our next meeting.",
         date: new Date("2025-05-01"),
+        user: {
+          user_id: "user_2",
+          role: "member",
+          name: "Jane Smith",
+          username: "janesmith",
+          email: "jane.smith@example.com",
+          password: "password",
+          avatar: "https://avatar.iran.liara.run/public/58",
+          created_at: new Date("2025-02-20"),
+        },
       },
       {
         komentar_id: "com_2",
@@ -224,6 +234,16 @@ export const tasks: Task[] = [
         comment:
           "Let's use JWT with a 7-day expiration and implement refresh tokens.",
         date: new Date("2025-05-02"),
+        user: {
+          user_id: "user_3",
+          role: "member",
+          name: "Michael Johnson",
+          username: "michaelj",
+          email: "michael.johnson@example.com",
+          password: "password",
+          avatar: "https://avatar.iran.liara.run/public/37",
+          created_at: new Date("2025-02-20"),
+        },
       },
     ],
   },
@@ -277,6 +297,16 @@ export const tasks: Task[] = [
         comment:
           "The dashboard UI looks great! Can we add a notification center to the top bar?",
         date: new Date("2025-05-10"),
+        user: {
+          user_id: "user_1",
+          role: "leader",
+          name: "John Doe",
+          username: "johndoe",
+          email: "john.doe@example.com",
+          password: "password",
+          avatar: "https://avatar.iran.liara.run/public/32",
+          created_at: new Date("2025-02-15"),
+        },
       },
     ],
   },
@@ -429,6 +459,16 @@ export const komentars: Komentar[] = [
     comment:
       "I've started working on the authentication API. We should discuss the token expiration policy at our next meeting.",
     date: new Date("2025-05-01"),
+    user: {
+      user_id: "user_2",
+      role: "member",
+      name: "Jane Smith",
+      username: "janesmith",
+      email: "jane.smith@example.com",
+      password: "password",
+      avatar: "https://avatar.iran.liara.run/public/58",
+      created_at: new Date("2025-02-20"),
+    },
   },
   {
     komentar_id: "com_2",
@@ -437,6 +477,16 @@ export const komentars: Komentar[] = [
     comment:
       "Let's use JWT with a 7-day expiration and implement refresh tokens.",
     date: new Date("2025-05-02"),
+    user: {
+      user_id: "user_3",
+      role: "member",
+      name: "Michael Johnson",
+      username: "michaelj",
+      email: "michael.johnson@example.com",
+      password: "password",
+      avatar: "https://avatar.iran.liara.run/public/37",
+      created_at: new Date("2025-02-20"),
+    },
   },
   {
     komentar_id: "com_3",
@@ -445,5 +495,15 @@ export const komentars: Komentar[] = [
     comment:
       "The dashboard UI looks great! Can we add a notification center to the top bar?",
     date: new Date("2025-05-10"),
+    user: {
+      user_id: "user_1",
+      role: "leader",
+      name: "John Doe",
+      username: "johndoe",
+      email: "john.doe@example.com",
+      password: "password",
+      avatar: "https://avatar.iran.liara.run/public/32",
+      created_at: new Date("2025-02-15"),
+    },
   },
 ];

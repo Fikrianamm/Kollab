@@ -1,7 +1,9 @@
+import { PriorityType, StatusType } from "@/types/types";
+
 export function PriorityTaskBadge({
   priority,
 }: {
-  priority: "urgent" | "high" | "medium" | "low" | "unknown";
+  priority: PriorityType;
 }) {
   let badgeTask = "";
   let text = "";
@@ -44,7 +46,7 @@ export function PriorityTaskBadge({
 export function StatusTaskBadge({
   status,
 }: {
-  status: "in progress" | "on review" | "done" | "to do";
+  status: StatusType;
 }) {
   let badgeTask = "";
   let text = "";

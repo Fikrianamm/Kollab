@@ -3,7 +3,7 @@ import { Task } from "@/types/types";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { format } from "date-fns";
 
-import { MoreHorizontal, PenLine, Trash2 } from "lucide-react";
+import { Eye, MoreHorizontal, PenLine, Trash2 } from "lucide-react";
 import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
 
@@ -40,9 +40,9 @@ function DropdownAction({ row }: { row: Row<Task> }) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <Link to={`/tasks/view/${task.task_id}`}>
+          <Link to={`/workspaces/${task.project_id}/task/${task.task_id}`}>
             <DropdownMenuItem>
-              <PenLine />
+              <Eye />
               View
             </DropdownMenuItem>
           </Link>

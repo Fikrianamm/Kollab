@@ -9,6 +9,7 @@ import LandingPage from "@/pages/LandingPage";
 import PeoplesPage from "@/pages/people/Page";
 import SettingPage from "@/pages/settings/Page";
 import TasksPage from "@/pages/tasks/Page";
+import TasksViewPage from "@/pages/tasks/view/Page";
 import WorkspacePage from "@/pages/workspace/Page";
 import { createBrowserRouter } from "react-router";
 
@@ -37,6 +38,7 @@ const router = createBrowserRouter([
               { path: "peoples", element: <PeoplesPage /> },
               { path: "tasks", element: <TasksPage /> },
               { path: "/workspaces/:id", element: <WorkspacePage /> },
+              { path: "/workspaces/:idWorkspace/task/:idTask", element: <TasksViewPage /> },
             ],
           },
         ],

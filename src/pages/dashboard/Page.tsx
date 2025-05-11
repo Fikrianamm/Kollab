@@ -189,12 +189,6 @@ export default function DashboardPage() {
           <Separator orientation="vertical" className="mr-2 h-4" />
           <Breadcrumb>
             <BreadcrumbList>
-              {/* <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="#">
-                  Building Your Application
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="hidden md:block" /> */}
               <BreadcrumbItem>
                 <BreadcrumbPage>Dashboard</BreadcrumbPage>
               </BreadcrumbItem>
