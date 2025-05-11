@@ -83,10 +83,10 @@ export default function PeoplesPage() {
           </Breadcrumb>
         </div>
       </header>
-      <div className="flex flex-1 flex-col gap-4 pb-28 px-4 lg:px-8 pt-0">
+      <div className="flex flex-1 flex-col gap-4 pb-28 px-4 pt-0">
         <div>
-          <h2 className="md:text-[32px] text-2xl font-semibold">Peoples</h2>
-          <p className="text-sm md:text-xl text-muted-foreground">
+          <h2 className="md:text-2xl text-lg font-semibold">Peoples</h2>
+          <p className="text-sm md:text-base text-muted-foreground">
             A list of all the people in your team
           </p>
         </div>
@@ -105,7 +105,7 @@ export default function PeoplesPage() {
             <div className="flex gap-2 w-full justify-end">
               <Button
                 variant="blue"
-                onClick={() => navigate("/invoice/create")}
+                onClick={() => navigate("/peoples/create")}
                 className="flex-1 md:flex-none"
               >
                 <CirclePlus size={16} />

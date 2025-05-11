@@ -6,6 +6,7 @@ import LoginPage from "@/pages/auth/login/Page";
 import RegisterPage from "@/pages/auth/register/Page";
 import DashboardPage from "@/pages/dashboard/Page";
 import LandingPage from "@/pages/LandingPage";
+import PeoplesCreatePage from "@/pages/people/create/Page";
 import PeoplesPage from "@/pages/people/Page";
 import SettingPage from "@/pages/settings/Page";
 import TasksPage from "@/pages/tasks/Page";
@@ -36,6 +37,7 @@ const router = createBrowserRouter([
               { path: "settings", element: <SettingPage /> },
               { path: "dashboard", element: <DashboardPage /> },
               { path: "peoples", element: <PeoplesPage /> },
+              { path: "peoples/create", element: <PeoplesCreatePage /> },
               { path: "tasks", element: <TasksPage /> },
               { path: "/workspaces/:id", element: <WorkspacePage /> },
               { path: "/workspaces/:idWorkspace/task/:idTask", element: <TasksViewPage /> },

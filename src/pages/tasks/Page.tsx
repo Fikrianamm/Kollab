@@ -111,10 +111,10 @@ export default function TasksPage() {
           </Breadcrumb>
         </div>
       </header>
-      <div className="flex flex-1 flex-col gap-4 pb-28 px-4 lg:px-8 pt-0">
+      <div className="flex flex-1 flex-col gap-4 pb-28 px-4 pt-0">
         <div>
-          <h2 className="md:text-[32px] text-2xl font-semibold">Tasks</h2>
-          <p className="text-sm md:text-xl text-muted-foreground">
+          <h2 className="md:text-2xl text-lg font-semibold">Tasks</h2>
+          <p className="text-sm md:text-base text-muted-foreground">
             A list of all the tasks in your team&apos;s project.
           </p>
         </div>

@@ -72,7 +72,7 @@ function FormProfile() {
   return (
     <>
       <div className="flex flex-col gap-2">
-        <p className="text-sm md:text-base font-normal text-muted-foreground">
+        <p className="text-xs md:text-sm font-normal text-muted-foreground">
           Preview Profile
         </p>
         <div className="flex gap-3 items-center">
@@ -98,10 +98,18 @@ function FormProfile() {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-foreground" htmlFor="name">
+                    <FormLabel
+                      className="text-foreground text-xs md:text-base"
+                      htmlFor="name"
+                    >
                       Name
                     </FormLabel>
-                    <Input id="name" placeholder="Your name" {...field} />
+                    <Input
+                      id="name"
+                      placeholder="Your name"
+                      {...field}
+                      className="text-xs md:text-base"
+                    />
                     <FormMessage />
                   </FormItem>
                 )}
@@ -114,7 +122,12 @@ function FormProfile() {
                     <FormLabel className="text-foreground" htmlFor="username">
                       Username
                     </FormLabel>
-                    <Input id="username" placeholder="Your username" {...field} />
+                    <Input
+                      id="username"
+                      placeholder="Your username"
+                      {...field}
+                      className="text-xs md:text-base"
+                    />
                     <FormMessage />
                   </FormItem>
                 )}
@@ -127,7 +140,12 @@ function FormProfile() {
                     <FormLabel className="text-foreground" htmlFor="email">
                       Email
                     </FormLabel>
-                    <Input id="email" placeholder="m@example.com" {...field} />
+                    <Input
+                      id="email"
+                      placeholder="m@example.com"
+                      {...field}
+                      className="text-xs md:text-base"
+                    />
                     <FormMessage />
                   </FormItem>
                 )}
@@ -136,7 +154,7 @@ function FormProfile() {
                 form={form}
                 name="avatar"
                 label="Avatar"
-                className="w-full"
+                className="w-full text-xs md:text-base"
               />
               <Button type="submit" variant={"blue"} className="w-max ml-auto">
                 Save
@@ -197,14 +215,19 @@ function FormPassword() {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel htmlFor="currPass">Current Password</FormLabel>
+                    <FormLabel
+                      htmlFor="currPass"
+                      className="text-xs md:text-base"
+                    >
+                      Current Password
+                    </FormLabel>
                     <div className="relative">
                       <Input
                         id="currPass"
                         type={showCurrPassword ? "text" : "password"}
                         placeholder="******"
                         {...field}
-                        className="pr-10"
+                        className="pr-10 text-xs md:text-base"
                       />
                       <button
                         type="button"
@@ -227,14 +250,19 @@ function FormPassword() {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel htmlFor="newPass">New Password</FormLabel>
+                    <FormLabel
+                      htmlFor="newPass"
+                      className="text-xs md:text-base"
+                    >
+                      New Password
+                    </FormLabel>
                     <div className="relative">
                       <Input
                         id="newPass"
                         type={showPassword ? "text" : "password"}
                         placeholder="******"
                         {...field}
-                        className="pr-10"
+                        className="pr-10 text-xs md:text-base"
                       />
                       <button
                         type="button"
@@ -257,7 +285,10 @@ function FormPassword() {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel htmlFor="confirmPass">
+                    <FormLabel
+                      htmlFor="confirmPass"
+                      className="text-xs md:text-base"
+                    >
                       Confirm Password
                     </FormLabel>
                     <div className="relative">
@@ -266,7 +297,7 @@ function FormPassword() {
                         type={showConfirmPassword ? "text" : "password"}
                         placeholder="******"
                         {...field}
-                        className="pr-10"
+                        className="pr-10 text-xs md:text-base"
                       />
                       <button
                         type="button"
@@ -314,10 +345,10 @@ export default function SettingPage() {
       <div className="flex flex-1 flex-col gap-4 pb-28 px-4">
         <div className="flex flex-col gap-4 p-4 rounded-md border border-border">
           <div>
-            <h2 className="md:text-[32px] text-2xl font-semibold">
+            <h2 className="md:text-2xl text-lg font-semibold">
               Profile Information
             </h2>
-            <p className="text-sm md:text-xl text-muted-foreground">
+            <p className="text-sm md:text-base text-muted-foreground">
               Update your accounts profile information
             </p>
           </div>
@@ -325,10 +356,10 @@ export default function SettingPage() {
         </div>
         <div className="flex flex-col gap-4 p-4 rounded-md border border-border">
           <div>
-            <h2 className="md:text-[32px] text-2xl font-semibold">
+            <h2 className="md:text-2xl text-lg font-semibold">
               Update Password
             </h2>
-            <p className="text-sm md:text-xl text-muted-foreground">
+            <p className="text-sm md:text-base text-muted-foreground">
               Ensure your account is using a long, random password to stay
               secure
             </p>

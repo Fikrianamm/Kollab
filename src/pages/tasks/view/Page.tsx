@@ -52,6 +52,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Back from "@/components/back";
 
 function CommentCard({
   avatar,
@@ -70,9 +71,7 @@ function CommentCard({
       <div className="flex flex-col flex-1 border border-border rounded-md">
         <div className="flex gap-2 px-4 py-2 bg-blue-900/10 border-b rounded-t-md border-border items-center">
           <div className="flex gap-2 items-center">
-            <p className="text-sm font-semibold text-foreground">
-              {username}
-            </p>
+            <p className="text-sm font-semibold text-foreground">{username}</p>
           </div>
           <p className="ml-1 font-normal text-muted-foreground text-sm">
             {formatCreatedAt(created_at as Date)}
@@ -289,6 +288,8 @@ export default function TasksViewPage() {
         <div className="flex items-center gap-2 px-4">
           <SidebarTrigger className="-ml-1" />
           <Separator orientation="vertical" className="mr-2 h-4" />
+          <Back />
+          <Separator orientation="vertical" className="mr-2 h-4" />
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">
@@ -300,7 +301,9 @@ export default function TasksViewPage() {
               </BreadcrumbItem>
               <BreadcrumbSeparator className="hidden md:block" />
               <BreadcrumbItem>
-                <BreadcrumbPage>{task?.title}</BreadcrumbPage>
+                <BreadcrumbPage className="line-clamp-1">
+                  {task?.title}
+                </BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>

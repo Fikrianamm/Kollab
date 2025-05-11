@@ -33,7 +33,10 @@ export function FileInput<TFieldValues extends FieldValues>({
       render={({ field, fieldState }) => (
         <div className={`grid items-center gap-1.5 ${className}`}>
           {label && (
-            <Label htmlFor={name} className="flex items-center gap-1">
+            <Label
+              htmlFor={name}
+              className="flex items-center gap-1 text-xs md:text-base"
+            >
               {label}
               {required && <span className="text-red-500">*</span>}
             </Label>
@@ -43,7 +46,7 @@ export function FileInput<TFieldValues extends FieldValues>({
             type="file"
             accept={accept}
             disabled={disabled}
-            className="cursor-pointer"
+            className="cursor-pointer text-xs md:text-base"
             onChange={(e) => {
               const file = e.target.files?.[0] || null;
               field.onChange(file);

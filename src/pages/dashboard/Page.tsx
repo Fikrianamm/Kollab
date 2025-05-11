@@ -196,10 +196,10 @@ export default function DashboardPage() {
           </Breadcrumb>
         </div>
       </header>
-      <div className="flex flex-1 flex-col gap-4 pb-28 px-4 lg:px-8 pt-0">
+      <div className="flex flex-1 flex-col gap-4 pb-28 px-4 pt-0">
         <div>
-          <h2 className="md:text-[32px] text-2xl font-semibold">Dashboard</h2>
-          <p className="text-sm md:text-xl text-muted-foreground">
+          <h2 className="md:text-2xl text-lg font-semibold">Dashboard</h2>
+          <p className="text-sm md:text-base text-muted-foreground">
             You can see a summary of the information here
           </p>
         </div>
@@ -214,7 +214,7 @@ export default function DashboardPage() {
               />
               <CardInfo
                 icon={LayoutGrid}
-                name="My Tasks"
+                name="Tasks"
                 count={32}
                 className="bg-orange-400/10 text-orange-400 border-orange-400"
               />
