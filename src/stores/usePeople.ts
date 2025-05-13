@@ -2,7 +2,7 @@
 // stores/usePeople.ts
 import { toast } from "@/hooks/use-toast";
 import { ICreatePerson, Response, User } from "@/types/types";
-import { createPeople, getAllPeople } from "@/utils/api";
+import { createPeople, deletePeople, getAllPeople } from "@/utils/api";
 import getErrorMessage from "@/utils/error";
 import { create, StoreApi, UseBoundStore } from "zustand";
 
@@ -11,6 +11,7 @@ interface IPeopleStore {
   loading: boolean;
   getAllPeople: () => Promise<Response<any>>;
   createPeople: (peopleData: ICreatePerson) => Promise<Response<any>>;
+  deletePeople: (id: string) => Promise<void>;
 }
 
 const usePeople: UseBoundStore<StoreApi<IPeopleStore>> = create((set, get) => ({
@@ -40,11 +41,6 @@ const usePeople: UseBoundStore<StoreApi<IPeopleStore>> = create((set, get) => ({
       if (!success) {
         throw new Error(message);
       }
-
-      const prevPeoples = get().peoples;
-      set(() => ({
-        peoples: [...(prevPeoples as User[]), peopleData],
-      }));
       toast({
         title: "Person Created",
         description: "You’ve successfully added a new person.",
@@ -58,6 +54,32 @@ const usePeople: UseBoundStore<StoreApi<IPeopleStore>> = create((set, get) => ({
         description: message || "Something went wrong. Please try again.",
       });
       return { message, success: false };
+    } finally {
+      set(() => ({ loading: false }));
+    }
+  },
+  deletePeople: async (id: string) => {
+    try {
+      set(() => ({ loading: true }));
+      const { success, message } = await deletePeople(id);
+      if (!success) {
+        throw new Error(message);
+      }
+
+      set(() => ({
+         peoples: get().peoples?.filter((people)=> people.id !== parseInt(id))
+      }));
+      toast({
+        title: "Person Deleted",
+        description: "You’ve successfully deleted person account.",
+      });
+    } catch (error) {
+      const message = getErrorMessage(error);
+      toast({
+        variant: "destructive",
+        title: "Oops, Something Went Wrong",
+        description: message || "Something went wrong. Please try again.",
+      });
     } finally {
       set(() => ({ loading: false }));
     }

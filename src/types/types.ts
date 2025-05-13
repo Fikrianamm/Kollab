@@ -110,3 +110,25 @@ export interface IUploadFile {
 export interface ICreatePerson extends User {
   confirm_password: string;
 }
+
+export interface ITaskData {
+  user_id: number;
+  title: string;
+  deadline: Date;
+  priority: string;
+  status: string;
+  description: string;
+  subtask?: SubTask[];
+}
+
+export interface ISubtaskData {
+  id: number;
+  is_complete: boolean;
+  description: string;
+}
+
+export interface IWorkspaceData {
+  name: string;
+  logo: string;
+  cover: string;
+}

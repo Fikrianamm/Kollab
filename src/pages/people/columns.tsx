@@ -3,15 +3,13 @@ import { User } from "@/types/types";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { format } from "date-fns";
 
-import { MoreHorizontal, PenLine, Trash2 } from "lucide-react";
-import { Link } from "react-router";
+import { MoreHorizontal, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
@@ -25,9 +23,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import usePeople from "@/stores/usePeople";
 
 function DropdownAction({ row }: { row: Row<User> }) {
   const people = row.original;
+  const { loading, deletePeople } = usePeople();
 
   return (
     <Dialog>
@@ -39,13 +39,6 @@ function DropdownAction({ row }: { row: Row<User> }) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <Link to={`/peoples/edit/`}>
-            <DropdownMenuItem>
-              <PenLine />
-              Edit
-            </DropdownMenuItem>
-          </Link>
-          <DropdownMenuSeparator />
           <DialogTrigger className="w-full">
             <DropdownMenuItem>
               <Trash2 />
@@ -65,12 +58,19 @@ function DropdownAction({ row }: { row: Row<User> }) {
         </DialogHeader>
         <DialogFooter className="flex flex-row justify-end gap-2">
           <div>
-            <Button variant="destructive" type="button">
-              Delete
+            <Button
+              variant="destructive"
+              type="button"
+              disabled={loading}
+              onClick={() => deletePeople(people.id?.toString() as string)}
+            >
+              {loading ? "Deleting..." : "Delete"}
             </Button>
           </div>
           <DialogClose>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline" disabled={loading}>
+              Cancel
+            </Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>
