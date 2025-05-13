@@ -10,10 +10,10 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff } from "lucide-react";
-import React from "react";
-import { Link } from "react-router";
-import { useToast } from "@/hooks/use-toast";
+import { Eye, EyeOff, LoaderCircle } from "lucide-react";
+import React, { useEffect } from "react";
+import { Link, Navigate, useNavigate } from "react-router";
+import useAuth from "@/stores/useAuth";
 
 const FormSchema = z.object({
   email: z.string().email().nonempty(),
@@ -24,7 +24,8 @@ const FormSchema = z.object({
 });
 export function LoginForm() {
   const [showPassword, setShowPassword] = React.useState(false);
-  const { toast } = useToast();
+  const { loading, login, getUser, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -39,14 +40,18 @@ export function LoginForm() {
   };
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+    const { success } = await login(data);
+    if (success) {
+      navigate("/dashboard", { replace: true });
+    }
+  }
+
+  useEffect(() => {
+    getUser();
+  }, [getUser]);
+
+  if (isAuthenticated) {
+    return <Navigate to={"/dashboard"} replace />;
   }
 
   return (
@@ -94,8 +99,12 @@ export function LoginForm() {
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full">
-            Sign In
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? (
+              <LoaderCircle size={16} className="animate-spin" />
+            ) : (
+              "Sign In"
+            )}
           </Button>
         </div>
         <div className="mt-4 text-center text-sm text-muted-foreground">

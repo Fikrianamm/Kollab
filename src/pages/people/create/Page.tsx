@@ -1,5 +1,5 @@
 import Back from "@/components/back";
-import { FileInput } from "@/components/fileInput";
+import { FileInputAvatarImage } from "@/components/fileInput";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -19,11 +19,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { useToast } from "@/hooks/use-toast";
+import usePeople from "@/stores/usePeople";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router";
 import { z } from "zod";
 
 const FormSchema = z
@@ -36,17 +37,18 @@ const FormSchema = z
       .string()
       .nonempty()
       .min(6, { message: "Password must be at least 6 characters" }),
-    confirmPassword: z.string(),
+    confirm_password: z.string(),
   })
-  .refine((data) => data.password === data.confirmPassword, {
+  .refine((data) => data.password === data.confirm_password, {
     message: "Passwords don't match",
-    path: ["confirmPassword"],
+    path: ["confirm_password"],
   });
 
 export default function PeoplesCreatePage() {
-  const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { loading, createPeople } = usePeople();
+  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -56,19 +58,15 @@ export default function PeoplesCreatePage() {
       email: "",
       avatar: "https://avatar.iran.liara.run/username?username=Your+Name",
       password: "",
-      confirmPassword: "",
+      confirm_password: "",
     },
   });
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+    const { success } = await createPeople(data);
+    if (success) {
+      navigate("/peoples");
+    }
   }
 
   const togglePasswordVisibility = () => {
@@ -117,7 +115,7 @@ export default function PeoplesCreatePage() {
             <img
               src={form.watch("avatar")}
               alt={form.watch("username")}
-              className="w-12 h-12 md:w-16 md:h-16"
+              className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-center object-fit-cover"
             />
             <div className="flex flex-col">
               <p className="text-sm md:text-lg font-semibold">
@@ -164,7 +162,7 @@ export default function PeoplesCreatePage() {
               )}
             />
             <FormField
-              name="name"
+              name="username"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
@@ -205,11 +203,12 @@ export default function PeoplesCreatePage() {
                 </FormItem>
               )}
             />
-            <FileInput
+            <FileInputAvatarImage
               form={form}
               name="avatar"
               label="Avatar"
               className="w-full text-xs md:text-base"
+              setValue={form.setValue}
             />
             <FormField
               name="password"
@@ -242,16 +241,16 @@ export default function PeoplesCreatePage() {
               )}
             />
             <FormField
-              name="confirmPassword"
+              name="confirm_password"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel htmlFor="confirmPassword">
+                  <FormLabel htmlFor="confirm_password">
                     Confirm Password
                   </FormLabel>
                   <div className="relative">
                     <Input
-                      id="confirmPassword"
+                      id="confirm_password"
                       type={showConfirmPassword ? "text" : "password"}
                       placeholder="******"
                       {...field}
@@ -277,9 +276,9 @@ export default function PeoplesCreatePage() {
               variant={"blue"}
               type="submit"
               className="ml-auto md:col-span-2"
-              disabled={form.formState.isSubmitting}
+              disabled={loading}
             >
-              {form.formState.isSubmitting ? "Creating..." : "Create"}
+              {loading ? "Creating..." : "Create"}
             </Button>
           </form>
         </Form>

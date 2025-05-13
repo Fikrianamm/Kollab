@@ -26,7 +26,12 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { INITIAL_TASKS } from "@/constants/taskConstants";
 import { workspaces } from "@/dummy/data";
-import { MoreHorizontal, PenLine, Plus, Trash2 } from "lucide-react";
+import {
+  MoreHorizontal,
+  PenLine,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { Link, useParams } from "react-router";
 import {
   DndContext,
@@ -213,7 +218,7 @@ export default function WorkspacePage() {
   const [containers, setContainers] = useState<Container[]>(INITIAL_TASKS);
   void setContainers;
 
-  const workspace = workspaces.find((workspace) => workspace.project_id === id);
+  const workspace = workspaces.find((workspace) => String(workspace.id) === id);
   // const [tasks, setTasks] = useState<ITask[]>([...INITIAL_TASKS]);
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
   void activeId;
@@ -399,12 +404,12 @@ export default function WorkspacePage() {
                 className="w-20 h-20 md:w-32 md:h-32 ml-4 rounded-md"
               />
               <h2 className="md:text-[32px] text-2xl font-semibold md:mb-2">
-                {workspace?.title}
+                {workspace?.name}
               </h2>
             </div>
             <WorkspaceActions />
             <div className="items-end md:flex hidden">
-              <Button variant={"transparent"}>Create Card</Button>
+              <Button variant={"transparent"}>Create Task</Button>
               <Button variant={"transparent"}>Setting</Button>
             </div>
           </div>

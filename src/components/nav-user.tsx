@@ -30,7 +30,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "./ui/button";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import useAuth from "@/stores/useAuth";
+import { useEffect } from "react";
 
 export function NavUser({
   user,
@@ -42,6 +44,16 @@ export function NavUser({
   };
 }) {
   const { isMobile } = useSidebar();
+  const { isAuthenticated, getUser, dataUser } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    getUser();
+  }, [getUser]);
+
+  useEffect(() => {
+    if (!isAuthenticated) navigate("/auth/login", { replace: true });
+  }, [isAuthenticated, navigate]);
 
   return (
     <Dialog>
@@ -74,12 +86,12 @@ export function NavUser({
                 className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
               >
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
+                  <AvatarImage src={dataUser?.avatar} alt={dataUser?.name} />
                   <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
+                  <span className="truncate font-medium">{dataUser?.name}</span>
+                  <span className="truncate text-xs">{dataUser?.email}</span>
                 </div>
                 <ChevronsUpDown className="ml-auto size-4" />
               </SidebarMenuButton>

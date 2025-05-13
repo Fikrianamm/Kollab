@@ -1,4 +1,4 @@
-import { FileInput } from "@/components/fileInput";
+import { FileInputAvatarImage } from "@/components/fileInput";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -150,11 +150,12 @@ function FormProfile() {
                   </FormItem>
                 )}
               />
-              <FileInput
+              <FileInputAvatarImage
                 form={form}
                 name="avatar"
                 label="Avatar"
                 className="w-full text-xs md:text-base"
+                setValue={form.setValue}
               />
               <Button type="submit" variant={"blue"} className="w-max ml-auto">
                 Save

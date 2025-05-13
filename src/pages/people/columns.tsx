@@ -39,7 +39,7 @@ function DropdownAction({ row }: { row: Row<User> }) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <Link to={`/peoples/edit/${people.user_id}`}>
+          <Link to={`/peoples/edit/`}>
             <DropdownMenuItem>
               <PenLine />
               Edit

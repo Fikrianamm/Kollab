@@ -49,8 +49,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   const projects = workspaces.map((workspace) => {
     return {
-      name: workspace.title,
-      url: `/workspaces/${workspace.project_id}`,
+      name: workspace.name,
+      url: `/workspaces/${workspace.id}`,
     };
   });
 

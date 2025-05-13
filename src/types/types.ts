@@ -1,75 +1,112 @@
 // User Interface
 export interface User {
-  user_id: string;
-  role: string;
+  id?: number;
+  role?: string;
   name: string;
   username?: string;
   email: string;
   password?: string;
   avatar: string;
-  created_at: Date;
+  created_at?: Date;
 }
 
 // Team Interface
 export interface Team {
-  team_id: string;
-  user_id: string;
+  id: number;
+  user_id: number;
   name: string;
+  user?: User;
 }
 
 // Member Interface
 export interface Member {
-  member_id: string;
-  user_id: string;
-  team_id: string;
+  id: number;
+  user_id: number;
+  team_id: number;
   user?: User;
   team?: Team;
 }
 
 // Workspace Interface
 export interface Workspace {
-  project_id: string;
-  user_id: string;
+  id: number;
+  user_id: number;
+  name: string;
   logo: string;
   cover: string;
-  title: string;
   user?: User;
+  task?: Task[];
 }
 
 // Task Interface
 export interface Task {
-  task_id: string;
-  project_id: string;
-  user_id: string;
+  id: number;
+  workspace_id: number;
+  user_id: number;
   title: string;
   deadline: Date;
   priority: string;
   status: string;
   description: string;
-  created_at: Date;
-  project?: Workspace;
+  created_at?: Date;
+  workspace?: Workspace;
   user?: User;
-  sub_tasks?: SubTask[];
-  komentars?: Komentar[];
+  subtask?: SubTask[];
+  comment?: Comment[];
 }
 
 // SubTask Interface
 export interface SubTask {
-  sub_task_id: string;
-  task_id: string;
+  id: number;
+  task_id: number;
   is_complete: boolean;
   description: string;
+  task?: Task[];
 }
 
-// Komentar Interface
-export interface Komentar {
-  komentar_id: string;
-  task_id: string;
-  user_id: string;
+// Comment Interface
+export interface Comment {
+  id: number;
+  task_id: number;
+  user_id: number;
   comment: string;
   date: Date;
-  user: User;
+  user?: User;
+  task?: Task;
 }
 
 export type PriorityType = "urgent" | "high" | "medium" | "low" | "unknown";
 export type StatusType = "in progress" | "on review" | "done" | "to do";
+
+export interface Response<T> {
+  message: string;
+  success: boolean;
+  data?: T;
+}
+
+export interface Credential {
+  email: string;
+  password: string;
+}
+
+export interface RegisterData {
+  name_team: string;
+  name: string;
+  username: string;
+  email: string;
+  password: string;
+  confirm_password: string;
+}
+
+export interface IUploadFile {
+  loading: boolean;
+  uploadProgress: number;
+  uploadFile: (
+    file: File,
+    onUploadProgress?: (progress: number) => void
+  ) => Promise<string | null>;
+}
+
+export interface ICreatePerson extends User {
+  confirm_password: string;
+}

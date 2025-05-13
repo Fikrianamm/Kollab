@@ -7,9 +7,8 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { columns } from "./columns";
-import { users } from "@/dummy/data";
 
-import React from "react";
+import React, { useEffect } from "react";
 import {
   ColumnFiltersState,
   flexRender,
@@ -40,6 +39,7 @@ import {
   TableRow,
 } from "../../components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
+import usePeople from "@/stores/usePeople";
 
 export default function PeoplesPage() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -49,10 +49,10 @@ export default function PeoplesPage() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const navigate = useNavigate();
-  const loading = false;
+  const { loading, getAllPeople, peoples } = usePeople();
 
   const table = useReactTable({
-    data: users || [],
+    data: peoples || [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -67,6 +67,10 @@ export default function PeoplesPage() {
       columnVisibility,
     },
   });
+
+  useEffect(() => {
+    getAllPeople();
+  }, []);
 
   return (
     <SidebarInset>

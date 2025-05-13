@@ -40,14 +40,16 @@ function DropdownAction({ row }: { row: Row<Task> }) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <Link to={`/workspaces/${task.project_id}/task/${task.task_id}`}>
+          <Link
+            to={`/workspaces/${task.workspace_id}/task/${task.workspace_id}`}
+          >
             <DropdownMenuItem>
               <Eye />
               View
             </DropdownMenuItem>
           </Link>
           <DropdownMenuSeparator />
-          <Link to={`/tasks/edit/${task.task_id}`}>
+          <Link to={`/tasks/edit/${task.id}`}>
             <DropdownMenuItem>
               <PenLine />
               Edit
@@ -109,7 +111,7 @@ export const columns: ColumnDef<Task>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      return <StatusTaskBadge status={row.getValue("status")} />
+      return <StatusTaskBadge status={row.getValue("status")} />;
     },
   },
   {
@@ -127,7 +129,7 @@ export const columns: ColumnDef<Task>[] = [
     },
   },
   {
-  accessorKey: "Actions",
+    accessorKey: "Actions",
     enableHiding: false,
     cell: ({ row }) => <DropdownAction row={row} />,
   },

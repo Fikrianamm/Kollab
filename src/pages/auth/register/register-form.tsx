@@ -10,40 +10,43 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, LoaderCircle } from "lucide-react";
 import React from "react";
-import { useToast } from "@/hooks/use-toast";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import useAuth from "@/stores/useAuth";
 
 const FormSchema = z
   .object({
-    teamName: z.string().nonempty(),
+    name_team: z.string().nonempty(),
     name: z.string().nonempty(),
+    username: z.string().nonempty(),
     email: z.string().email().nonempty(),
     password: z
       .string()
       .nonempty()
       .min(6, { message: "Password must be at least 6 characters" }),
-    confirmPassword: z.string(),
+    confirm_password: z.string(),
   })
-  .refine((data) => data.password === data.confirmPassword, {
+  .refine((data) => data.password === data.confirm_password, {
     message: "Passwords don't match",
-    path: ["confirmPassword"],
+    path: ["confirm_password"],
   });
 
 export function RegisterForm() {
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
-  const { toast } = useToast();
+  const { loading, register } = useAuth();
+  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      teamName: "",
+      name_team: "",
       name: "",
+      username: "",
       email: "",
       password: "",
-      confirmPassword: "",
+      confirm_password: "",
     },
   });
 
@@ -56,14 +59,10 @@ export function RegisterForm() {
   };
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+    const { success } = await register(data);
+    if (success) {
+      navigate("/auth/login");
+    }
   }
 
   return (
@@ -71,12 +70,12 @@ export function RegisterForm() {
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <div className="flex flex-col gap-4">
           <FormField
-            name="teamName"
+            name="name_team"
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel htmlFor="teamName">Team Name</FormLabel>
-                <Input id="teamName" placeholder="Your team name" {...field} />
+                <FormLabel htmlFor="name_team">Team Name</FormLabel>
+                <Input id="name_team" placeholder="Your team name" {...field} />
                 <FormMessage />
               </FormItem>
             )}
@@ -88,6 +87,17 @@ export function RegisterForm() {
               <FormItem>
                 <FormLabel htmlFor="name">Name</FormLabel>
                 <Input id="name" placeholder="Your name" {...field} />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            name="username"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel htmlFor="username">Username</FormLabel>
+                <Input id="username" placeholder="Your username" {...field} />
                 <FormMessage />
               </FormItem>
             )}
@@ -130,16 +140,16 @@ export function RegisterForm() {
             )}
           />
           <FormField
-            name="confirmPassword"
+            name="confirm_password"
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel htmlFor="confirmPassword">
+                <FormLabel htmlFor="confirm_password">
                   Confirm Password
                 </FormLabel>
                 <div className="relative">
                   <Input
-                    id="confirmPassword"
+                    id="confirm_password"
                     type={showConfirmPassword ? "text" : "password"}
                     placeholder="******"
                     {...field}
@@ -161,8 +171,12 @@ export function RegisterForm() {
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full">
-            Sign Up as Leader
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? (
+              <LoaderCircle size={16} className="animate-spin" />
+            ) : (
+              "Sign Up as Leader"
+            )}
           </Button>
         </div>
         <div className="mt-4 text-center text-sm text-muted-foreground">

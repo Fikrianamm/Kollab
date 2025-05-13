@@ -108,8 +108,8 @@ export function AssigneesSelector() {
             <CommandGroup>
               {users.map((user) => (
                 <CommandItem
-                  key={user.user_id}
-                  value={user.user_id}
+                  key={user.id}
+                  value={String(user.id)}
                   onSelect={(currentValue) => {
                     setValue(currentValue === value ? "" : currentValue);
                     setOpen(false);
@@ -119,7 +119,7 @@ export function AssigneesSelector() {
                   <Check
                     className={cn(
                       "ml-auto",
-                      value === user.user_id ? "opacity-100" : "opacity-0"
+                      value === String(user.id) ? "opacity-100" : "opacity-0"
                     )}
                   />
                 </CommandItem>
@@ -215,11 +215,11 @@ export function StatusDropdown({
 
 export default function TasksViewPage() {
   const { idTask } = useParams();
-  const task = tasks.find((task) => task.task_id === idTask);
+  const task = tasks.find((task) => String(task.id) === idTask);
   const formatedDate = format(task?.deadline as Date, "dd LLL yyyy");
   const { toast } = useToast();
   const initialDataSubtasks = subTasks.filter(
-    (subtask) => subtask.task_id === task?.task_id
+    (subtask) => subtask.task_id === task?.id
   );
   const [subtasks, setSubtasks] = useState<SubTask[]>(
     initialDataSubtasks ?? []
@@ -252,7 +252,7 @@ export default function TasksViewPage() {
   const toggleSubtask = (id: string) => {
     setSubtasks((subtasks) =>
       subtasks.map((task) =>
-        task.sub_task_id === id
+        String(task.id) === id
           ? { ...task, is_complete: !task.is_complete }
           : task
       )
@@ -267,10 +267,10 @@ export default function TasksViewPage() {
       setSubtasks([
         ...subtasks,
         {
-          sub_task_id: "task-1",
+          id: 20,
           description: newSubtask,
           is_complete: false,
-          task_id: task?.task_id as string,
+          task_id: task?.id as number,
         },
       ]);
       setNewSubtask("");
@@ -279,7 +279,7 @@ export default function TasksViewPage() {
   };
 
   const deleteSubtask = (id: string) => {
-    setSubtasks(subtasks.filter((task) => task.sub_task_id !== id));
+    setSubtasks(subtasks.filter((task) => String(task.id) !== id));
   };
 
   return (
@@ -293,10 +293,8 @@ export default function TasksViewPage() {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink
-                  href={`/workspaces/${task?.project?.project_id}`}
-                >
-                  {task?.project?.title}
+                <BreadcrumbLink href={`/workspaces/${task?.workspace?.id}`}>
+                  {task?.workspace?.name}
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator className="hidden md:block" />
@@ -367,19 +365,17 @@ export default function TasksViewPage() {
                 <div className="flex flex-col gap-2 mt-4">
                   {subtasks.map((task) => (
                     <div
-                      key={task.sub_task_id}
+                      key={task.id}
                       className="flex items-center justify-between"
                     >
                       <div className="flex items-center space-x-2">
                         <Checkbox
-                          id={task.sub_task_id}
+                          id={String(task.id)}
                           checked={task.is_complete}
-                          onCheckedChange={() =>
-                            toggleSubtask(task.sub_task_id)
-                          }
+                          onCheckedChange={() => toggleSubtask(String(task.id))}
                         />
                         <label
-                          htmlFor={task.sub_task_id}
+                          htmlFor={String(task.id)}
                           className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                         >
                           {task.description}
@@ -389,7 +385,7 @@ export default function TasksViewPage() {
                         variant={"ghost"}
                         className="hover:bg-red-200/30! dark:hover:bg-red-500/10! hover:text-red-600!"
                         type="button"
-                        onClick={() => deleteSubtask(task.sub_task_id)}
+                        onClick={() => deleteSubtask(String(task.id))}
                       >
                         <Trash size={16} />
                       </Button>
@@ -424,9 +420,9 @@ export default function TasksViewPage() {
                 </div>
               </div>
             </div>
-            {task?.komentars?.map((comment) => (
+            {task?.comment?.map((comment) => (
               <CommentCard
-                avatar={comment.user.avatar as string}
+                avatar={comment?.user?.avatar as string}
                 username={comment?.user?.username as string}
                 description={comment?.comment as string}
                 created_at={comment?.date as Date}
