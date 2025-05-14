@@ -34,17 +34,9 @@ import { Link, useNavigate } from "react-router";
 import useAuth from "@/stores/useAuth";
 import { useEffect } from "react";
 
-export function NavUser({
-  user,
-}: {
-  user: {
-    name: string;
-    email: string;
-    avatar: string;
-  };
-}) {
+export function NavUser() {
   const { isMobile } = useSidebar();
-  const { isAuthenticated, getUser, dataUser } = useAuth();
+  const { isAuthenticated, getUser, dataUser, logout, loading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -54,6 +46,14 @@ export function NavUser({
   useEffect(() => {
     if (!isAuthenticated) navigate("/auth/login", { replace: true });
   }, [isAuthenticated, navigate]);
+
+  const handleLogout = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const { success } = await logout();
+    if (success) {
+      navigate("/auth/login", { replace: true });
+    }
+  };
 
   return (
     <Dialog>
@@ -68,11 +68,16 @@ export function NavUser({
         </DialogHeader>
         <DialogFooter className="sm:justify-end">
           <DialogClose asChild>
-            <Button type="button" variant="secondary">
+            <Button type="button" variant="secondary" disabled={loading}>
               Back
             </Button>
           </DialogClose>
-          <Button type="button" variant="destructive">
+          <Button
+            type="button"
+            variant="destructive"
+            onClick={handleLogout}
+            disabled={loading}
+          >
             Logout
           </Button>
         </DialogFooter>
@@ -105,12 +110,14 @@ export function NavUser({
               <DropdownMenuLabel className="p-0 font-normal">
                 <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                   <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src={user.avatar} alt={user.name} />
+                    <AvatarImage src={dataUser?.avatar} alt={dataUser?.name} />
                     <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">{user.name}</span>
-                    <span className="truncate text-xs">{user.email}</span>
+                    <span className="truncate font-medium">
+                      {dataUser?.name}
+                    </span>
+                    <span className="truncate text-xs">{dataUser?.email}</span>
                   </div>
                 </div>
               </DropdownMenuLabel>

@@ -10,8 +10,11 @@ import PeoplesCreatePage from "@/pages/people/create/Page";
 import PeoplesPage from "@/pages/people/Page";
 import SettingPage from "@/pages/settings/Page";
 import TasksCreatePage from "@/pages/tasks/create/Page";
+import TasksEditPage from "@/pages/tasks/edit/Page";
 import TasksPage from "@/pages/tasks/Page";
 import TasksViewPage from "@/pages/tasks/view/Page";
+import WorkspaceCreatePage from "@/pages/workspace/create/Page";
+import WorkspaceEditPage from "@/pages/workspace/edit/Page";
 import WorkspacePage from "@/pages/workspace/Page";
 import { createBrowserRouter } from "react-router";
 
@@ -44,11 +47,14 @@ const router = createBrowserRouter([
               
               // tasks
               { path: "tasks", element: <TasksPage /> },
-              { path: "/tasks/create", element: <TasksCreatePage /> },
+              { path: "tasks/create", element: <TasksCreatePage /> },
+              { path: "tasks/edit/:id", element: <TasksEditPage /> },
+              { path: "workspaces/:idWorkspace/task/:idTask", element: <TasksViewPage /> },
               
               // workspaces
               { path: "workspaces/:id", element: <WorkspacePage /> },
-              { path: "workspaces/:idWorkspace/task/:idTask", element: <TasksViewPage /> },
+              { path: "workspaces/create", element: <WorkspaceCreatePage /> },
+              { path: "workspaces/edit/:id", element: <WorkspaceEditPage /> },
             ],
           },
         ],

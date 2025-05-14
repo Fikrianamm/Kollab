@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -6,9 +7,6 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { tasks, users, workspaces } from "@/dummy/data";
-
-import React from "react";
 import {
   ColumnFiltersState,
   flexRender,
@@ -28,15 +26,17 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router";
 import { Input } from "@/components/ui/input";
-import { Button } from "../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../../components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -44,13 +44,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "../../components/ui/table";
+} from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { columns } from "./columns";
-import {
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-} from "@radix-ui/react-dropdown-menu";
+import useTask from "@/stores/useTask";
+import useAuth from "@/stores/useAuth";
+import useWorkspace from "@/stores/useWorkspace";
+import usePeople from "@/stores/usePeople";
+import React, { useEffect } from "react";
 
 export default function TasksPage() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -59,8 +60,14 @@ export default function TasksPage() {
   );
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
+  const [assigneeFilter, setAssigneeFilter] = React.useState<string>("all");
+  const [workspaceFilter, setWorkspaceFilter] = React.useState<string>("all");
+
   const navigate = useNavigate();
-  const loading = false;
+  const { loading: tasksLoading, getAllTask, tasks } = useTask();
+  const { dataUser } = useAuth();
+  // const { workspaces, loading: workspacesLoading } = useWorkspace();
+  const { getAllPeople, peoples, loading: peoplesLoading } = usePeople();
 
   const table = useReactTable({
     data: tasks || [],
@@ -81,6 +88,7 @@ export default function TasksPage() {
 
   // Filter handlers
   const handleAssigneeFilter = (value: string) => {
+    setAssigneeFilter(value);
     if (value === "all") {
       table.getColumn("user_id")?.setFilterValue(undefined);
     } else {
@@ -89,12 +97,38 @@ export default function TasksPage() {
   };
 
   const handleWorkspaceFilter = (value: string) => {
+    setWorkspaceFilter(value);
     if (value === "all") {
-      table.getColumn("project_id")?.setFilterValue(undefined);
+      table.getColumn("workspace_id")?.setFilterValue(undefined);
     } else {
-      table.getColumn("project_id")?.setFilterValue(value);
+      table.getColumn("workspace_id")?.setFilterValue(value);
     }
   };
+
+  // Reset all filters
+  const handleResetFilters = () => {
+    setAssigneeFilter("all");
+    setWorkspaceFilter("all");
+    table.getColumn("user_id")?.setFilterValue(undefined);
+    table.getColumn("workspace_id")?.setFilterValue(undefined);
+    table.getColumn("title")?.setFilterValue("");
+  };
+
+  useEffect(() => {
+    getAllTask();
+  }, [getAllTask]);
+
+  useEffect(() => {
+    getAllPeople();
+  }, [getAllPeople]);
+
+  // Sync filter states with table filters
+  useEffect(() => {
+    const userIdFilter = table.getColumn("user_id")?.getFilterValue();
+    const workspaceIdFilter = table.getColumn("workspace_id")?.getFilterValue();
+    setAssigneeFilter(userIdFilter ? String(userIdFilter) : "all");
+    setWorkspaceFilter(workspaceIdFilter ? String(workspaceIdFilter) : "all");
+  }, [table]);
 
   return (
     <SidebarInset>
@@ -115,7 +149,7 @@ export default function TasksPage() {
         <div>
           <h2 className="md:text-2xl text-lg font-semibold">Tasks</h2>
           <p className="text-sm md:text-base text-muted-foreground">
-            A list of all the tasks in your team&apos;s project.
+            A list of all the tasks in your team's project.
           </p>
         </div>
         <div className="w-full">
@@ -131,86 +165,126 @@ export default function TasksPage() {
               className="md:max-w-sm w-full"
             />
             <div className="flex gap-2 w-full justify-end flex-wrap">
-              {/* Assigned To Filter */}
-              <DropdownMenu>
+              {/* Assignee Filter */}
+              {/* <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="flex gap-2">
-                    <Users size={16} />
-                    <span>Assignee</span>
-                    <ChevronDown size={16} />
+                  <Button
+                    variant="outline"
+                    className="flex gap-2"
+                    disabled={peoplesLoading}
+                  >
+                    {peoplesLoading ? (
+                      <Skeleton className="w-16 h-4" />
+                    ) : (
+                      <>
+                        <Users size={16} />
+                        <span>Assignee</span>
+                        <ChevronDown size={16} />
+                      </>
+                    )}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuLabel>Filter by Assignee</DropdownMenuLabel>
+                  <DropdownMenuLabel className="px-2 py-1">
+                    Filter by Assignee
+                  </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuRadioGroup
                     onValueChange={handleAssigneeFilter}
-                    value={
-                      (table
-                        .getColumn("user_id")
-                        ?.getFilterValue() as string) ?? "all"
-                    }
+                    value={assigneeFilter}
                   >
                     <DropdownMenuRadioItem value="all">
                       All Assignees
                     </DropdownMenuRadioItem>
-                    {users.map((assignee) => (
-                      <DropdownMenuRadioItem
-                        key={assignee.user_id}
-                        value={assignee.user_id}
-                      >
-                        {assignee.name}
+                    {peoples && peoples.length > 0 ? (
+                      peoples
+                        .filter((assignee) => assignee.id != null)
+                        .map((assignee) => (
+                          <DropdownMenuRadioItem
+                            key={assignee.id}
+                            value={String(assignee.id)}
+                          >
+                            {assignee.name}
+                          </DropdownMenuRadioItem>
+                        ))
+                    ) : (
+                      <DropdownMenuRadioItem value="" disabled>
+                        No assignees available
                       </DropdownMenuRadioItem>
-                    ))}
+                    )}
                   </DropdownMenuRadioGroup>
                 </DropdownMenuContent>
-              </DropdownMenu>
+              </DropdownMenu> */}
 
               {/* Workspace Filter */}
-              <DropdownMenu>
+              {/* <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="flex gap-2">
-                    <BriefcaseBusiness size={16} />
-                    <span>Workspace</span>
-                    <ChevronDown size={16} />
+                  <Button
+                    variant="outline"
+                    className="flex gap-2"
+                    disabled={workspacesLoading}
+                  >
+                    {workspacesLoading ? (
+                      <Skeleton className="w-16 h-4" />
+                    ) : (
+                      <>
+                        <BriefcaseBusiness size={16} />
+                        <span>Workspace</span>
+                        <ChevronDown size={16} />
+                      </>
+                    )}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuLabel>Filter by Workspace</DropdownMenuLabel>
+                  <DropdownMenuLabel className="px-2 py-1">
+                    Filter by Workspace
+                  </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuRadioGroup
                     onValueChange={handleWorkspaceFilter}
-                    value={
-                      (table
-                        .getColumn("project_id")
-                        ?.getFilterValue() as string) ?? "all"
-                    }
+                    value={workspaceFilter}
                   >
                     <DropdownMenuRadioItem value="all">
                       All Workspaces
                     </DropdownMenuRadioItem>
-                    {workspaces.map((workspace) => (
-                      <DropdownMenuRadioItem
-                        key={workspace.project_id}
-                        value={workspace.project_id}
-                      >
-                        {workspace.title}
+                    {workspaces && workspaces.length > 0 ? (
+                      workspaces
+                        .filter((workspace) => workspace.id != null)
+                        .map((workspace) => (
+                          <DropdownMenuRadioItem
+                            key={workspace.id}
+                            value={String(workspace.name)}
+                          >
+                            {workspace.name}
+                          </DropdownMenuRadioItem>
+                        ))
+                    ) : (
+                      <DropdownMenuRadioItem value="" disabled>
+                        No workspaces available
                       </DropdownMenuRadioItem>
-                    ))}
+                    )}
                   </DropdownMenuRadioGroup>
                 </DropdownMenuContent>
-              </DropdownMenu>
-              <Button
-                variant="blue"
-                onClick={() => navigate("/invoice/create")}
-              >
-                <CirclePlus size={16} />
-                <span>Create</span>
-              </Button>
+              </DropdownMenu> */}
+
+              {/* Reset Filters Button */}
+              {/* <Button variant="outline" onClick={handleResetFilters}>
+                Reset Filters
+              </Button> */}
+
+              {dataUser?.role === "Leader" && (
+                <Button
+                  variant="blue"
+                  onClick={() => navigate("/tasks/create")}
+                >
+                  <CirclePlus size={16} />
+                  <span>Create</span>
+                </Button>
+              )}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline">
-                    Columns <ChevronDown />
+                    Columns <ChevronDown size={16} />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -252,21 +326,16 @@ export default function TasksPage() {
                 ))}
               </TableHeader>
               <TableBody>
-                {loading ? (
-                  [...Array(5)].map(
-                    (
-                      _,
-                      rowIndex // Ubah 5 sesuai jumlah row skeleton yang diinginkan
-                    ) => (
-                      <TableRow key={rowIndex}>
-                        {columns.map((_column, colIndex) => (
-                          <TableCell key={colIndex}>
-                            <Skeleton className="w-full h-6 rounded-md" />
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    )
-                  )
+                {tasksLoading ? (
+                  [...Array(5)].map((_, rowIndex) => (
+                    <TableRow key={rowIndex}>
+                      {columns.map((_column, colIndex) => (
+                        <TableCell key={colIndex}>
+                          <Skeleton className="w-full h-6 rounded-md" />
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
                 ) : table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
                     <TableRow

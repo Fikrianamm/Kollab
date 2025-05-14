@@ -16,8 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { users } from "@/dummy/data";
-import { useToast } from "@/hooks/use-toast";
+import useAuth from "@/stores/useAuth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
 import React from "react";
@@ -46,28 +45,23 @@ export const FormPasswordSchema = z
   });
 
 function FormProfile() {
-  const user = users[0];
-  const { toast } = useToast();
+  const { dataUser, logout, updateProfile } = useAuth();
 
   const form = useForm<z.infer<typeof FormProfileSchema>>({
     resolver: zodResolver(FormProfileSchema),
     defaultValues: {
-      name: user.name,
-      username: user.username,
-      email: user.email,
-      avatar: "",
+      name: dataUser?.name,
+      username: dataUser?.username,
+      email: dataUser?.email,
+      avatar: dataUser?.avatar,
     },
   });
 
   async function onSubmit(data: z.infer<typeof FormProfileSchema>) {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+    const { success } = await updateProfile(data);
+    if (success) {
+      logout();
+    }
   }
   return (
     <>
@@ -77,14 +71,16 @@ function FormProfile() {
         </p>
         <div className="flex gap-3 items-center">
           <img
-            src={user.avatar}
-            alt={user.name}
-            className="w-12 h-12 md:w-16 md:h-16"
+            src={form.watch("avatar")}
+            alt={dataUser?.name}
+            className="w-12 h-12 md:w-16 md:h-16 rounded-full"
           />
           <div className="flex flex-col">
-            <p className="text-sm md:text-lg font-semibold">@{user.username}</p>
+            <p className="text-sm md:text-lg font-semibold">
+              @{form.watch("username")}
+            </p>
             <p className="text-xs md:text-base font-normal text-muted-foreground">
-              {user.email}
+              {form.watch("email")}
             </p>
           </div>
         </div>
@@ -157,8 +153,13 @@ function FormProfile() {
                 className="w-full text-xs md:text-base"
                 setValue={form.setValue}
               />
-              <Button type="submit" variant={"blue"} className="w-max ml-auto">
-                Save
+              <Button
+                type="submit"
+                variant={"blue"}
+                className="w-max ml-auto"
+                disabled={form.formState.isSubmitting}
+              >
+                {form.formState.isSubmitting ? "Saving..." : "Save"}
               </Button>
             </div>
           </form>
@@ -172,7 +173,7 @@ function FormPassword() {
   const [showCurrPassword, setShowCurrPassword] = React.useState(false);
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
-  const { toast } = useToast();
+  const { updatePassword, logout } = useAuth();
 
   const form = useForm<z.infer<typeof FormPasswordSchema>>({
     resolver: zodResolver(FormPasswordSchema),
@@ -196,14 +197,15 @@ function FormPassword() {
   };
 
   async function onSubmit(data: z.infer<typeof FormPasswordSchema>) {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+    const formData = {
+      current_password: data.currPass,
+      new_password: data.newPass,
+      confirm_pass: data.confirmPass,
+    };
+    const { success } = await updatePassword(formData);
+    if (success) {
+      logout();
+    }
   }
   return (
     <>
@@ -316,8 +318,13 @@ function FormPassword() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" variant={"blue"} className="w-max ml-auto">
-                Save
+              <Button
+                type="submit"
+                variant={"blue"}
+                className="w-max ml-auto"
+                disabled={form.formState.isSubmitting}
+              >
+                {form.formState.isSubmitting ? "Saving..." : "Save"}
               </Button>
             </div>
           </form>

@@ -26,9 +26,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { PriorityTaskBadge, StatusTaskBadge } from "@/components/badge";
+import useTask from "@/stores/useTask";
 
 function DropdownAction({ row }: { row: Row<Task> }) {
   const task = row.original;
+  const { loading, deleteTask } = useTask();
 
   return (
     <Dialog>
@@ -41,7 +43,7 @@ function DropdownAction({ row }: { row: Row<Task> }) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <Link
-            to={`/workspaces/${task.workspace_id}/task/${task.workspace_id}`}
+            to={`/workspaces/${task.workspace_id}/task/${task.id}`}
           >
             <DropdownMenuItem>
               <Eye />
@@ -74,12 +76,19 @@ function DropdownAction({ row }: { row: Row<Task> }) {
         </DialogHeader>
         <DialogFooter className="flex flex-row justify-end gap-2">
           <div>
-            <Button variant="destructive" type="button">
+            <Button
+              variant="destructive"
+              type="button"
+              disabled={loading}
+              onClick={() => deleteTask(task.id?.toString() as string)}
+            >
               Delete
             </Button>
           </div>
           <DialogClose>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline" disabled={loading}>
+              Cancel
+            </Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>
@@ -95,7 +104,7 @@ export const columns: ColumnDef<Task>[] = [
     ),
   },
   {
-    accessorKey: "project.title",
+    accessorKey: "workspace.name",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Workspace" />
     ),
@@ -121,10 +130,10 @@ export const columns: ColumnDef<Task>[] = [
     ),
   },
   {
-    accessorKey: "created_at",
-    header: "Created At",
+    accessorKey: "deadline",
+    header: "Deadline",
     cell: ({ row }) => {
-      const formattedDate = format(row.getValue("created_at"), "LLL dd, yyyy");
+      const formattedDate = format(row.getValue("deadline"), "LLL dd, yyyy");
       return <div>{formattedDate}</div>;
     },
   },

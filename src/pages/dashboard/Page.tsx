@@ -1,19 +1,19 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbList,
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
-import { Progress } from "@/components/ui/progress";
+// import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { tasks } from "@/dummy/data";
 import { Task } from "@/types/types";
 import {
   BriefcaseBusiness,
   LayoutGrid,
   ListTodo,
-  LoaderCircle,
+  // LoaderCircle,
   SquareCheck,
   Users,
 } from "lucide-react";
@@ -29,6 +29,8 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import useDashboard from "@/stores/useDashboard";
+import { useEffect } from "react";
 
 function CardInfo(item: {
   icon: LucideIcon;
@@ -109,16 +111,7 @@ function TasksList({ tasks, priority }: { tasks: Task[]; priority: string }) {
   );
 }
 
-function ProductivityChart() {
-  const chartData = [
-    { month: "Desember", todo: 1, inProgress: 4, onReview: 5, done: 8 },
-    { month: "January", todo: 2, inProgress: 7, onReview: 2, done: 11 },
-    { month: "February", todo: 0, inProgress: 1, onReview: 7, done: 7 },
-    { month: "March", todo: 7, inProgress: 3, onReview: 2, done: 5 },
-    { month: "April", todo: 3, inProgress: 7, onReview: 2, done: 10 },
-    { month: "May", todo: 4, inProgress: 5, onReview: 1, done: 13 },
-  ];
-
+function ProductivityChart({ chartData }: { chartData: any }) {
   const chartConfig = {
     todo: {
       label: "To Do",
@@ -139,8 +132,8 @@ function ProductivityChart() {
   } satisfies ChartConfig;
 
   return (
-    <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-      <BarChart accessibilityLayer data={chartData}>
+    <ChartContainer config={chartConfig} className=" max-h-96 w-full">
+      <BarChart accessibilityLayer data={chartData || []}>
         <CartesianGrid vertical={false} />
         <XAxis
           dataKey="month"
@@ -161,13 +154,19 @@ function ProductivityChart() {
 }
 
 export default function DashboardPage() {
+  const { getDashboardData, data } = useDashboard();
+
+  useEffect(() => {
+    getDashboardData();
+  }, [getDashboardData]);
+
   const tasksUrgent: Task[] = [];
   const tasksHigh: Task[] = [];
   const tasksMedium: Task[] = [];
   const tasksLow: Task[] = [];
   const tasksUnknown: Task[] = [];
 
-  tasks.forEach((task: Task) => {
+  data?.myTask?.forEach((task: Task) => {
     if (task.priority === "urgent") {
       tasksUrgent.push(task);
     } else if (task.priority === "high") {
@@ -209,25 +208,25 @@ export default function DashboardPage() {
               <CardInfo
                 icon={BriefcaseBusiness}
                 name="Workspaces"
-                count={6}
+                count={data?.workspaces as number}
                 className="bg-green-600/10 text-green-600 border-green-600"
               />
               <CardInfo
                 icon={LayoutGrid}
                 name="Tasks"
-                count={32}
+                count={data?.tasks as number}
                 className="bg-orange-400/10 text-orange-400 border-orange-400"
               />
               <CardInfo
                 icon={Users}
                 name="Members"
-                count={8}
+                count={data?.people as number}
                 className="bg-neutral-400/10 text-neutral-400 border-neutral-400"
               />
               <CardInfo
                 icon={SquareCheck}
                 name="Tasks Completed"
-                count={11}
+                count={data?.tasksDone as number}
                 className="bg-blue-600/10 text-blue-600 border-blue-600"
               />
               <Card className="rounded-md col-span-2 bg-transparent">
@@ -235,7 +234,7 @@ export default function DashboardPage() {
                   Productivity Chart
                 </CardTitle>
                 <CardContent>
-                  <ProductivityChart />
+                  <ProductivityChart chartData={data?.chartData} />
                 </CardContent>
               </Card>
             </div>
@@ -243,7 +242,7 @@ export default function DashboardPage() {
           <div className="border-border border rounded-md order-0 md:order-last col-span-2 md:col-span-1 p-4">
             <h2 className="md:text-2xl text-lg font-bold">Your To Do List</h2>
 
-            <div className="mt-4 flex flex-col gap-1">
+            {/* <div className="mt-4 flex flex-col gap-1">
               <div className="flex items-center gap-1">
                 <LoaderCircle className="md:w-4 md:h-4 w-3 h-3" />
                 <p className="md:text-base text-sm">Tasks Progress</p>
@@ -258,7 +257,7 @@ export default function DashboardPage() {
                 </p>
                 <p className="md:text-sm text-xs text-blue-600">50%</p>
               </div>
-            </div>
+            </div> */}
 
             <TasksList tasks={tasksUrgent} priority="urgent" />
             <TasksList tasks={tasksHigh} priority="high" />

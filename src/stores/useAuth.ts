@@ -1,7 +1,21 @@
 // stores/useAuth.ts
 import { toast } from "@/hooks/use-toast";
-import { Credential, RegisterData, Response, User } from "@/types/types";
-import { getUserAuth, login, register } from "@/utils/api";
+import {
+  Credential,
+  IUpdatePassword,
+  IUpdateProfile,
+  RegisterData,
+  Response,
+  User,
+} from "@/types/types";
+import {
+  getUserAuth,
+  login,
+  logout,
+  register,
+  updatePassword,
+  updateProfile,
+} from "@/utils/api";
 import getErrorMessage from "@/utils/error";
 import { create, StoreApi, UseBoundStore } from "zustand";
 
@@ -10,9 +24,11 @@ interface IAuthStore {
   loading: boolean;
   isAuthenticated: boolean;
   login: (credential: Credential) => Promise<Response<User>>;
-  logout: () => void;
+  logout: () => Promise<Response<null>>;
   getUser: () => Promise<Response<null>>;
   register: (registerData: RegisterData) => Promise<Response<null>>;
+  updateProfile: (data: IUpdateProfile) => Promise<Response<null>>;
+  updatePassword: (data: IUpdatePassword) => Promise<Response<null>>;
 }
 
 const useAuth: UseBoundStore<StoreApi<IAuthStore>> = create((set) => ({
@@ -26,18 +42,19 @@ const useAuth: UseBoundStore<StoreApi<IAuthStore>> = create((set) => ({
       if (!success) {
         throw new Error(message);
       }
+
       toast({
-        description: "Login success",
+        title: "Login success!",
+        description: `Welcome back, ${data.username}`,
       });
-      set(() => ({ dataUser: data }));
       set(() => ({ isAuthenticated: true }));
       return { success: true, message, data };
     } catch (error) {
       const message = getErrorMessage(error);
       toast({
         variant: "destructive",
-        title: "Login failed!",
-        description: message,
+        title: "Oops, Something Went Wrong",
+        description: message || "Something went wrong. Please try again.",
       });
       return { message, success: false };
     } finally {
@@ -45,21 +62,29 @@ const useAuth: UseBoundStore<StoreApi<IAuthStore>> = create((set) => ({
     }
   },
   logout: async () => {
-    // try {
-    //   set(() => ({ loading: true }));
-    //   Cookies.remove("token");
-    //   const message = "Logout successfully";
-    //   set(() => ({ isAuthenticated: false }));
-    //   return { message, success: true };
-    // } catch (error) {
-    //   const message = getErrorMessage(error);
-    //   toast({
-    //     description: "Logout failed!",
-    //   });
-    //   return { message, success: false };
-    // } finally {
-    //   set(() => ({ loading: false }));
-    // }
+    try {
+      set(() => ({ loading: true }));
+      const { success, message } = await logout();
+      if (!success) {
+        throw new Error(message);
+      }
+      set(() => ({ dataUser: null }));
+      set(() => ({ isAuthenticated: false }));
+      toast({
+        title: "Logout successful!",
+      });
+      return { message, success };
+    } catch (error) {
+      const message = getErrorMessage(error);
+      toast({
+        variant: "destructive",
+        title: "Oops, Something Went Wrong",
+        description: message || "Something went wrong. Please try again.",
+      });
+      return { message, success: false };
+    } finally {
+      set(() => ({ loading: false }));
+    }
   },
   getUser: async () => {
     try {
@@ -94,8 +119,66 @@ const useAuth: UseBoundStore<StoreApi<IAuthStore>> = create((set) => ({
       const message = getErrorMessage(error);
       toast({
         variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: message,
+        title: "Oops, Something Went Wrong",
+        description: message || "Something went wrong. Please try again.",
+      });
+      return { message, success: false };
+    } finally {
+      set(() => ({ loading: false }));
+    }
+  },
+  updateProfile: async (data: IUpdateProfile) => {
+    try {
+      set(() => ({ loading: true }));
+      const { success, message, data: updatedData } = await updateProfile(data);
+      if (!success) {
+        throw new Error(message);
+      }
+      toast({
+        title: "Profile Updated",
+        description:
+          "You’ve successfully updated your profile. Please log in again.",
+      });
+      set((state) => ({
+        dataUser: {
+          ...state.dataUser,
+          name: updatedData.name,
+          username: updatedData.username,
+          email: updatedData.email,
+          avatar: updatedData.avatar,
+        },
+      }));
+      return { success: true, message };
+    } catch (error) {
+      const message = getErrorMessage(error);
+      toast({
+        variant: "destructive",
+        title: "Oops, Something Went Wrong",
+        description: message || "Something went wrong. Please try again.",
+      });
+      return { message, success: false };
+    } finally {
+      set(() => ({ loading: false }));
+    }
+  },
+  updatePassword: async (data: IUpdatePassword) => {
+    try {
+      set(() => ({ loading: true }));
+      const { success, message } = await updatePassword(data);
+      if (!success) {
+        throw new Error(message);
+      }
+      toast({
+        title: "Password Updated",
+        description: "You’ve successfully updated your password. Please log in again.",
+      });
+      return { success: true, message };
+    } catch (error) {
+      const message = getErrorMessage(error);
+      toast({
+        variant: "destructive",
+        title: "Oops, Something Went Wrong",
+        description: message || "Something went wrong. Please try again.",
       });
       return { message, success: false };
     } finally {

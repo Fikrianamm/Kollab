@@ -9,23 +9,22 @@ import {
 import { Form, FormField, FormItem } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { subTasks, tasks, users } from "@/dummy/data";
-import { useToast } from "@/hooks/use-toast";
+import { users } from "@/dummy/data";
 import formatCreatedAt from "@/utils/format";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format } from "date-fns";
 import { Calendar, Plus, Settings, Trash } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router";
 import { z } from "zod";
 import ReactQuill from "react-quill-new";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { PriorityType, StatusType, SubTask } from "@/types/types";
+import { useEffect, useState } from "react";
+import { PriorityType, StatusType } from "@/types/types";
 import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Check } from "lucide-react";
+import parse from "html-react-parser";
 
 import { cn } from "@/lib/utils";
 
@@ -53,6 +52,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Back from "@/components/back";
+import useTask from "@/stores/useTask";
+import useWorkspace from "@/stores/useWorkspace";
+import useAuth from "@/stores/useAuth";
+import { format } from "date-fns";
 
 function CommentCard({
   avatar,
@@ -67,7 +70,7 @@ function CommentCard({
 }) {
   return (
     <div className="flex gap-4 items-start">
-      <img src={avatar} alt={username} className="w-8 h-8" />
+      <img src={avatar} alt={username} className="w-8 h-8 rounded-full" />
       <div className="flex flex-col flex-1 border border-border rounded-md">
         <div className="flex gap-2 px-4 py-2 bg-blue-900/10 border-b rounded-t-md border-border items-center">
           <div className="flex gap-2 items-center">
@@ -78,7 +81,7 @@ function CommentCard({
           </p>
         </div>
         <div className="p-4">
-          <p className="text-sm text-foreground">{description}</p>
+          <p className="text-sm text-foreground">{parse(description)}</p>
         </div>
       </div>
     </div>
@@ -87,6 +90,10 @@ function CommentCard({
 
 const FormSchema = z.object({
   comment: z.string().nonempty(),
+});
+
+const FormSchemaSubtask = z.object({
+  description: z.string().nonempty(),
 });
 
 export function AssigneesSelector() {
@@ -214,22 +221,23 @@ export function StatusDropdown({
 }
 
 export default function TasksViewPage() {
-  const { idTask } = useParams();
-  const task = tasks.find((task) => String(task.id) === idTask);
-  const formatedDate = format(task?.deadline as Date, "dd LLL yyyy");
-  const { toast } = useToast();
-  const initialDataSubtasks = subTasks.filter(
-    (subtask) => subtask.task_id === task?.id
-  );
-  const [subtasks, setSubtasks] = useState<SubTask[]>(
-    initialDataSubtasks ?? []
-  );
+  const { dataUser } = useAuth();
+  const { idTask, idWorkspace } = useParams();
 
-  const completedCount = subtasks.filter((task) => task.is_complete).length;
-  const progress =
-    subtasks.length > 0
-      ? Math.round((completedCount / subtasks.length) * 100)
-      : 0;
+  const {
+    task,
+    loading,
+    getTask,
+    createComment,
+    createSubtask,
+    deleteSubtask,
+    updateSubtask,
+  } = useTask();
+  const { workspaces } = useWorkspace();
+  const currWorkspace = workspaces?.find(
+    (obj) => obj.id.toString() === idWorkspace
+  );
+  const [isAddingSubtask, setIsAddingSubtask] = useState(false);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -238,49 +246,86 @@ export default function TasksViewPage() {
     },
   });
 
-  async function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+  function toggleIsAddingSubtask() {
+    setIsAddingSubtask(!isAddingSubtask);
   }
 
-  const toggleSubtask = (id: string) => {
-    setSubtasks((subtasks) =>
-      subtasks.map((task) =>
-        String(task.id) === id
-          ? { ...task, is_complete: !task.is_complete }
-          : task
-      )
+  const formSubtask = useForm<z.infer<typeof FormSchemaSubtask>>({
+    resolver: zodResolver(FormSchemaSubtask),
+    defaultValues: {
+      description: "",
+    },
+  });
+
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    const { success } = await createComment(
+      data,
+      task?.id.toString() as string
     );
-  };
+    if (success) {
+      getTask(task?.id.toString() as string);
+    }
+  }
 
-  const [newSubtask, setNewSubtask] = useState("");
-  const [isAddingSubtask, setIsAddingSubtask] = useState(false);
-
-  const addSubtask = () => {
-    if (newSubtask.trim()) {
-      setSubtasks([
-        ...subtasks,
-        {
-          id: 20,
-          description: newSubtask,
-          is_complete: false,
-          task_id: task?.id as number,
-        },
-      ]);
-      setNewSubtask("");
+  async function onSubmitSubtask(data: z.infer<typeof FormSchemaSubtask>) {
+    const { success } = await createSubtask(
+      data,
+      task?.id.toString() as string
+    );
+    if (success) {
+      getTask(task?.id.toString() as string);
+      formSubtask.reset({
+        description: "",
+      });
       setIsAddingSubtask(false);
     }
-  };
+  }
 
-  const deleteSubtask = (id: string) => {
-    setSubtasks(subtasks.filter((task) => String(task.id) !== id));
-  };
+  async function handleCheckedChange(subtaskId: string, is_complete: boolean) {
+    const { success } = await updateSubtask(
+      { is_complete: !is_complete },
+      subtaskId
+    );
+    if (success) {
+      getTask(task?.id.toString() as string);
+    }
+  }
+
+  // const addSubtask = () => {
+  //   if (newSubtask.trim()) {
+  //     setSubtasks([
+  //       ...subtasks,
+  //       {
+  //         id: 20,
+  //         description: newSubtask,
+  //         is_complete: false,
+  //         task_id: task?.id as number,
+  //       },
+  //     ]);
+  //     setNewSubtask("");
+  //     setIsAddingSubtask(false);
+  //   }
+  // };
+
+  async function handleDeleteSubtask(subtaskId: string) {
+    const { success } = await deleteSubtask(subtaskId);
+    if (success) {
+      getTask(task?.id.toString() as string);
+    }
+  }
+
+  useEffect(() => {
+    getTask(idTask as string);
+  }, [getTask, idTask]);
+
+  const completedCount =
+    task?.subtask?.filter((obj) => obj.is_complete).length || 0;
+  const progress =
+    task?.subtask && task?.subtask?.length > 0
+      ? Math.round((completedCount / task?.subtask?.length) * 100)
+      : 0;
+  const formatedDateDeadline = task && format(task?.deadline as Date, "dd LLL yyyy");
+  const parsedDesc = parse(task?.description || "");
 
   return (
     <SidebarInset>
@@ -294,7 +339,7 @@ export default function TasksViewPage() {
             <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">
                 <BreadcrumbLink href={`/workspaces/${task?.workspace?.id}`}>
-                  {task?.workspace?.name}
+                  {currWorkspace?.name}
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator className="hidden md:block" />
@@ -308,235 +353,265 @@ export default function TasksViewPage() {
         </div>
       </header>
       <div className="flex flex-1 flex-col gap-4 pb-28 px-4 pt-0">
-        <div className="flex flex-col gap-2">
-          <h2 className="text-xl md:text-3xl font-semibold text-foreground">
-            {task?.title}
-          </h2>
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Calendar size={16} />
-            <p className="text-xs md:text-sm font-normal">
-              Deadline
-              <span className="text-red-500 ml-2">{formatedDate}</span>
-            </p>
+        {loading ? (
+          <div className="border border-border w-full h-full flex items-center justify-center rounded-md">
+            Loading...
           </div>
-        </div>
-        {/* grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 md:gap-4 mt-2 md:mt-4">
-          {/* information task */}
-          <div className="flex flex-col col-span-2 gap-4">
-            {/* description task */}
-            <div className="flex flex-col border border-border rounded-md mb-4">
-              <div className="flex flex-wrap gap-2 px-4 py-2 bg-blue-900/10 border-b border-border items-center">
-                <div className="flex gap-2 items-center">
-                  <img
-                    src={task?.user?.avatar}
-                    alt={task?.user?.username}
-                    className="w-7 h-7"
-                  />
-                  <p className="text-base font-semibold text-foreground">
-                    {task?.user?.username}
-                  </p>
-                </div>
-                <p className="ml-2 font-normal text-muted-foreground text-sm">
-                  created at {format(task?.created_at as Date, "dd LLL yyyy p")}
+        ) : (
+          <>
+            <div className="flex flex-col gap-2">
+              <h2 className="text-xl md:text-3xl font-semibold text-foreground">
+                {task?.title}
+              </h2>
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Calendar size={16} />
+                <p className="text-xs md:text-sm font-normal">
+                  Deadline
+                  <span className="text-red-500 ml-2">{formatedDateDeadline}</span>
                 </p>
               </div>
-              <div className="p-4">
-                <p className="text-base text-foreground">{task?.description}</p>
-              </div>
-              <Separator />
-              <div className="p-4">
-                <div className="flex justify-between items-center mb-2">
-                  <div className="flex gap-2 items-center">
-                    <h3 className="text-base font-semibold">Sub-Task</h3>
-                    <p className="text-muted-foreground text-xs md:text-sm">{`${completedCount}/${subtasks.length} completed`}</p>
+            </div>
+            {/* grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 md:gap-4 mt-2 md:mt-4">
+              {/* information task */}
+              <div className="flex flex-col col-span-2 gap-4">
+                {/* description task */}
+                <div className="flex flex-col border border-border rounded-md mb-4">
+                  <div className="flex flex-wrap gap-2 px-4 py-2 bg-blue-900/10 border-b border-border items-center">
+                    <div className="flex gap-2 items-center">
+                      <img
+                        src={task?.user?.avatar}
+                        alt={task?.user?.username}
+                        className="w-7 h-7 rounded-full"
+                      />
+                      <p className="text-base font-semibold text-foreground">
+                        @{task?.user?.username}
+                      </p>
+                    </div>
                   </div>
-                  <Button
-                    variant={"transparent"}
-                    type="button"
-                    className="text-blue-600"
-                    onClick={() => setIsAddingSubtask(true)}
-                  >
-                    <Plus size={16} />
-                    Add Subtask
-                  </Button>
-                </div>
-                <Progress value={progress} />
-                <div className="flex flex-col gap-2 mt-4">
-                  {subtasks.map((task) => (
-                    <div
-                      key={task.id}
-                      className="flex items-center justify-between"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id={String(task.id)}
-                          checked={task.is_complete}
-                          onCheckedChange={() => toggleSubtask(String(task.id))}
-                        />
-                        <label
-                          htmlFor={String(task.id)}
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          {task.description}
-                        </label>
+                  <div className="p-4">
+                    <p className="text-base text-foreground">{parsedDesc}</p>
+                  </div>
+                  <Separator />
+                  <div className="p-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <div className="flex gap-2 items-center">
+                        <h3 className="text-base font-semibold">Sub-Task</h3>
+                        <p className="text-muted-foreground text-xs md:text-sm">{`${completedCount}/${task?.subtask?.length} completed`}</p>
                       </div>
                       <Button
-                        variant={"ghost"}
-                        className="hover:bg-red-200/30! dark:hover:bg-red-500/10! hover:text-red-600!"
+                        variant={"transparent"}
                         type="button"
-                        onClick={() => deleteSubtask(String(task.id))}
+                        className="text-blue-600"
+                        onClick={() => toggleIsAddingSubtask()}
                       >
-                        <Trash size={16} />
+                        <Plus size={16} />
+                        Add Subtask
                       </Button>
                     </div>
-                  ))}
-                  {/* Add new sub-task input */}
-                  {isAddingSubtask && (
-                    <div className="mt-3 flex items-center">
-                      <Input
-                        type="text"
-                        value={newSubtask}
-                        onChange={(e) => setNewSubtask(e.target.value)}
-                        placeholder="Add new sub-task"
-                        autoFocus
-                      />
-                      <Button
-                        variant={"blue"}
-                        onClick={addSubtask}
-                        className="ml-2 bg-blue-500 px-3 py-2 rounded-md text-sm"
-                      >
-                        Add
-                      </Button>
-                      <Button
-                        variant={"ghost"}
-                        onClick={() => setIsAddingSubtask(false)}
-                        className="ml-2 text-gray-400 px-3 py-2 rounded-md text-sm"
-                      >
-                        Cancel
-                      </Button>
+                    <Progress value={progress} />
+                    <div className="flex flex-col gap-2 mt-4">
+                      {task?.subtask?.map((subtask) => (
+                        <div
+                          key={subtask.id}
+                          className="flex items-center justify-between"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              id={String(subtask.id)}
+                              checked={subtask.is_complete}
+                              onCheckedChange={() =>
+                                handleCheckedChange(
+                                  String(subtask.id),
+                                  subtask.is_complete
+                                )
+                              }
+                            />
+                            <label
+                              htmlFor={String(subtask.id)}
+                              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            >
+                              {subtask.description}
+                            </label>
+                          </div>
+                          <Button
+                            variant={"ghost"}
+                            className="hover:bg-red-200/30! dark:hover:bg-red-500/10! hover:text-red-600!"
+                            type="button"
+                            onClick={() => handleDeleteSubtask(String(subtask.id))}
+                          >
+                            <Trash size={16} />
+                          </Button>
+                        </div>
+                      ))}
+                      {/* Add new sub-task input */}
+                      {isAddingSubtask && (
+                        <Form {...formSubtask}>
+                          <form
+                            onSubmit={formSubtask.handleSubmit(onSubmitSubtask)}
+                            className="mt-3 flex items-center"
+                          >
+                            <FormField
+                              name="description"
+                              control={formSubtask.control}
+                              render={({ field }) => (
+                                <FormItem className="w-full">
+                                  <Input
+                                    type="text"
+                                    placeholder="Add new sub-task"
+                                    autoFocus
+                                    {...field}
+                                  />
+                                </FormItem>
+                              )}
+                            />
+                            <Button
+                              variant={"blue"}
+                              type="submit"
+                              className="ml-2 bg-blue-500 px-3 py-2 rounded-md text-sm"
+                            >
+                              Add
+                            </Button>
+                            <Button
+                              variant={"ghost"}
+                              onClick={() => setIsAddingSubtask(false)}
+                              className="ml-2 text-gray-400 px-3 py-2 rounded-md text-sm"
+                            >
+                              Cancel
+                            </Button>
+                          </form>
+                        </Form>
+                      )}
                     </div>
-                  )}
+                  </div>
+                </div>
+                {task?.comment?.map((comment) => (
+                  <CommentCard
+                    avatar={comment?.user?.avatar as string}
+                    username={comment?.user?.username as string}
+                    description={comment?.comment as string}
+                    created_at={comment?.date as Date}
+                  />
+                ))}
+                {/* Comment input */}
+                <div className="flex gap-4 items-start">
+                  <img
+                    src={dataUser?.avatar}
+                    alt={dataUser?.username}
+                    className="w-8 h-8 rounded-full"
+                  />
+                  <div className="flex flex-col flex-1">
+                    <div className="flex gap-2 mb-2 items-center">
+                      <div className="flex gap-2 items-center">
+                        <p className="text-sm font-semibold text-foreground">
+                          Add a comment
+                        </p>
+                      </div>
+                    </div>
+                    <div className="pb-4">
+                      <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)}>
+                          <FormField
+                            name="comment"
+                            control={form.control}
+                            render={({ field }) => (
+                              <FormItem>
+                                <ReactQuill
+                                  theme="snow"
+                                  placeholder="Add your comment"
+                                  className={`${
+                                    form.formState.errors.comment
+                                      ? "border-red-500"
+                                      : ""
+                                  } h-max`}
+                                  {...field}
+                                  onChange={(content) =>
+                                    field.onChange(content)
+                                  }
+                                />
+                              </FormItem>
+                            )}
+                          />
+                          <div className="w-full mt-2 flex justify-end">
+                            <Button
+                              variant={"blue"}
+                              type="submit"
+                              className="ml-auto"
+                              disabled={
+                                form.watch("comment")?.trim().length === 0 ||
+                                form.formState.isSubmitting
+                              }
+                            >
+                              {form.formState.isSubmitting
+                                ? "Loading..."
+                                : "Comment"}
+                            </Button>
+                          </div>
+                        </form>
+                      </Form>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-            {task?.comment?.map((comment) => (
-              <CommentCard
-                avatar={comment?.user?.avatar as string}
-                username={comment?.user?.username as string}
-                description={comment?.comment as string}
-                created_at={comment?.date as Date}
-              />
-            ))}
-            {/* Comment input */}
-            <div className="flex gap-4 items-start">
-              <img
-                src={task?.user?.avatar}
-                alt={task?.user?.username}
-                className="w-8 h-8"
-              />
-              <div className="flex flex-col flex-1">
-                <div className="flex gap-2 mb-2 items-center">
-                  <div className="flex gap-2 items-center">
-                    <p className="text-sm font-semibold text-foreground">
-                      Add a comment
+              {/* settings task */}
+              <div className="flex-col flex gap-2 mt-2 md:mt-0">
+                {/* assignees */}
+                <div className="flex flex-col">
+                  <div className="flex justify-between items-center">
+                    <p className="text-muted-foreground text-sm mb-2">
+                      Assignees
+                    </p>
+                    {/* <Button variant={"ghost"} type="button">
+                  <Settings />
+                </Button> */}
+                    {/* <AssigneesSelector /> */}
+                  </div>
+                  <div className="flex gap-3 items-center">
+                    <img
+                      src={task?.user?.avatar}
+                      alt={task?.user?.username}
+                      className="w-6 h-6 rounded-full"
+                    />
+                    <p className="text-foreground text-sm">
+                      {task?.user?.username}
                     </p>
                   </div>
                 </div>
-                <div className="pb-4">
-                  <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)}>
-                      <FormField
-                        name="comment"
-                        control={form.control}
-                        render={({ field }) => (
-                          <FormItem>
-                            <ReactQuill
-                              theme="snow"
-                              placeholder="Add your comment"
-                              className={`${
-                                form.formState.errors.comment
-                                  ? "border-red-500"
-                                  : ""
-                              } h-max`}
-                              {...field}
-                              onChange={(content) => field.onChange(content)}
-                            />
-                          </FormItem>
-                        )}
-                      />
-                      <div className="w-full mt-2 flex justify-end">
-                        <Button
-                          variant={"blue"}
-                          type="submit"
-                          className="ml-auto"
-                          disabled={
-                            form.watch("comment")?.trim().length === 0 ||
-                            form.formState.isSubmitting
-                          }
-                        >
-                          {form.formState.isSubmitting
-                            ? "Loading..."
-                            : "Comment"}
-                        </Button>
-                      </div>
-                    </form>
-                  </Form>
+                <Separator className="mt-2" />
+
+                {/* priority */}
+                <div className="flex flex-col gap-2">
+                  <div className="flex justify-between items-center">
+                    <p className="text-muted-foreground text-sm">Priority</p>
+                    {/* <PriorityDropdown
+                      currPriorityTask={task?.priority as PriorityType}
+                    /> */}
+                  </div>
+                  <div>
+                    <PriorityTaskBadge
+                      priority={task?.priority as PriorityType}
+                    />
+                  </div>
                 </div>
-              </div>
-            </div>
-          </div>
-          {/* settings task */}
-          <div className="flex-col flex gap-2 mt-2 md:mt-0">
-            {/* assignees */}
-            <div className="flex flex-col">
-              <div className="flex justify-between items-center">
-                <p className="text-muted-foreground text-sm">Assignees</p>
-                {/* <Button variant={"ghost"} type="button">
-                  <Settings />
-                </Button> */}
-                <AssigneesSelector />
-              </div>
-              <div className="flex gap-3 items-center">
-                <img
-                  src={task?.user?.avatar}
-                  alt={task?.user?.username}
-                  className="w-6 h-6"
-                />
-                <p className="text-foreground text-sm">
-                  {task?.user?.username}
-                </p>
-              </div>
-            </div>
-            <Separator className="mt-2" />
+                <Separator className="mt-2" />
 
-            {/* priority */}
-            <div className="flex flex-col gap-2">
-              <div className="flex justify-between items-center">
-                <p className="text-muted-foreground text-sm">Priority</p>
-                <PriorityDropdown
-                  currPriorityTask={task?.priority as PriorityType}
-                />
-              </div>
-              <div>
-                <PriorityTaskBadge priority={task?.priority as PriorityType} />
-              </div>
-            </div>
-            <Separator className="mt-2" />
-
-            {/* status */}
-            <div className="flex flex-col gap-2">
-              <div className="flex justify-between items-center">
-                <p className="text-muted-foreground text-sm">Status</p>
-                <StatusDropdown currStatusTask={task?.status as StatusType} />
-              </div>
-              <div>
-                <StatusTaskBadge status={task?.status as StatusType} />
+                {/* status */}
+                <div className="flex flex-col gap-2">
+                  <div className="flex justify-between items-center">
+                    <p className="text-muted-foreground text-sm">Status</p>
+                    {/* <StatusDropdown
+                      currStatusTask={task?.status as StatusType}
+                    /> */}
+                  </div>
+                  <div>
+                    <StatusTaskBadge status={task?.status as StatusType} />
+                  </div>
+                </div>
+                <Separator className="mt-2" />
               </div>
             </div>
-            <Separator className="mt-2" />
-          </div>
-        </div>
+          </>
+        )}
       </div>
     </SidebarInset>
   );

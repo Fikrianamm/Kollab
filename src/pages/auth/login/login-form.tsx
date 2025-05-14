@@ -66,7 +66,7 @@ export function LoginForm() {
                 <FormLabel className="text-muted-foreground" htmlFor="email">
                   Email
                 </FormLabel>
-                <Input id="email" placeholder="m@example.com" {...field} />
+                <Input id="email" placeholder="m@example.com" {...field} autoFocus/>
                 <FormMessage />
               </FormItem>
             )}

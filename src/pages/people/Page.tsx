@@ -41,6 +41,7 @@ import {
 } from "../../components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import usePeople from "@/stores/usePeople";
+import useAuth from "@/stores/useAuth";
 
 export default function PeoplesPage() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -51,6 +52,7 @@ export default function PeoplesPage() {
     React.useState<VisibilityState>({});
   const navigate = useNavigate();
   const { loading, getAllPeople, peoples } = usePeople();
+  const { dataUser } = useAuth();
 
   const table = useReactTable({
     data: peoples || [],
@@ -108,14 +110,16 @@ export default function PeoplesPage() {
               className="md:max-w-sm w-full"
             />
             <div className="flex gap-2 w-full justify-end">
-              <Button
-                variant="blue"
-                onClick={() => navigate("/peoples/create")}
-                className="flex-1 md:flex-none"
-              >
-                <CirclePlus size={16} />
-                <span>Create</span>
-              </Button>
+              {dataUser?.role === "Leader" && (
+                <Button
+                  variant="blue"
+                  onClick={() => navigate("/peoples/create")}
+                  className="flex-1 md:flex-none"
+                >
+                  <CirclePlus size={16} />
+                  <span>Create</span>
+                </Button>
+              )}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline">

@@ -30,7 +30,7 @@ export interface Member {
 // Workspace Interface
 export interface Workspace {
   id: number;
-  user_id: number;
+  user_id?: number;
   name: string;
   logo: string;
   cover: string;
@@ -75,8 +75,15 @@ export interface Comment {
   task?: Task;
 }
 
+export interface ICommentData {
+  comment: string;
+}
+
 export type PriorityType = "urgent" | "high" | "medium" | "low" | "unknown";
 export type StatusType = "in progress" | "on review" | "done" | "to do";
+
+export const enumPriorityType = ["urgent", "high", "medium", "low", "unknown"];
+export const enumStatusType = ["in progress", "on review", "done", "to do"];
 
 export interface Response<T> {
   message: string;
@@ -112,7 +119,7 @@ export interface ICreatePerson extends User {
 }
 
 export interface ITaskData {
-  user_id: number;
+  user_id: string;
   title: string;
   deadline: Date;
   priority: string;
@@ -131,4 +138,17 @@ export interface IWorkspaceData {
   name: string;
   logo: string;
   cover: string;
+}
+
+export interface IUpdateProfile {
+  name: string;
+  username: string;
+  email: string;
+  avatar: string;
+}
+
+export interface IUpdatePassword {
+  current_password: string;
+  new_password: string;
+  confirm_pass: string;
 }

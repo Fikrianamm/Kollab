@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/sidebar";
 import { ModeToggle } from "./mode-toggle";
 import { useTheme } from "./theme-provider";
-import { workspaces } from "@/dummy/data";
+import useWorkspace from "@/stores/useWorkspace";
 
 // This is sample data.
 const data = {
@@ -47,12 +47,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const logoSrc =
     theme === "light" ? "/LogoSimpleLight.svg" : "/LogoSimpleDark.svg";
 
-  const projects = workspaces.map((workspace) => {
+  const { loading, getAllWorkspace, workspaces } = useWorkspace();
+
+  const projects = workspaces?.map((workspace) => {
     return {
       name: workspace.name,
       url: `/workspaces/${workspace.id}`,
     };
   });
+
+  React.useEffect(() => {
+    getAllWorkspace();
+  }, [getAllWorkspace]);
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -77,11 +83,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavWorkspaces projects={projects} />
+        {projects && <NavWorkspaces projects={projects} />}
+        {loading && (
+          <div className="space-y-2 px-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className="h-8 w-full animate-pulse rounded-md bg-muted"
+              />
+            ))}
+          </div>
+        )}
       </SidebarContent>
       <SidebarFooter>
         <ModeToggle />
-        <NavUser user={data.user} />
+        <NavUser />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
