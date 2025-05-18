@@ -549,10 +549,13 @@ export default function WorkspacePage() {
               {loading ? (
                 <div className="w-20 h-20 md:w-32 md:h-32 ml-4 rounded-md bg-gray-600 animate-pulse" />
               ) : (
-                <img
-                  src={workspace?.logo}
-                  className="w-20 h-20 md:w-32 md:h-32 ml-4 rounded-md"
-                  alt={workspace?.name}
+                <div
+                  className="w-20 h-20 md:w-32 md:h-32 ml-4 rounded-md bg-center"
+                  style={{
+                    backgroundImage: `url(${workspace?.logo})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
                 />
               )}
               <h2 className="md:text-[32px] text-2xl font-semibold md:mb-2">
@@ -563,7 +566,8 @@ export default function WorkspacePage() {
               <>
                 <WorkspaceActions />
                 <div className="items-end md:flex hidden">
-                  <Link to={`/tasks/create?workspaceId=${workspace?.id}`}>
+                  {/* <Link to={`/tasks/create?workspaceId=${workspace?.id}`}> */}
+                  <Link to={`/tasks/create`}>
                     <Button variant={"transparent"}>Create Task</Button>
                   </Link>
                   <Link to={`/workspaces/edit/${workspace?.id}`}>

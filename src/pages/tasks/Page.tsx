@@ -19,10 +19,8 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 import {
-  BriefcaseBusiness,
   ChevronDown,
   CirclePlus,
-  Users,
 } from "lucide-react";
 import { useNavigate } from "react-router";
 import { Input } from "@/components/ui/input";
@@ -31,10 +29,6 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -49,7 +43,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { columns } from "./columns";
 import useTask from "@/stores/useTask";
 import useAuth from "@/stores/useAuth";
-import useWorkspace from "@/stores/useWorkspace";
 import usePeople from "@/stores/usePeople";
 import React, { useEffect } from "react";
 
@@ -61,13 +54,15 @@ export default function TasksPage() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [assigneeFilter, setAssigneeFilter] = React.useState<string>("all");
+  void assigneeFilter
   const [workspaceFilter, setWorkspaceFilter] = React.useState<string>("all");
+  void workspaceFilter
 
   const navigate = useNavigate();
   const { loading: tasksLoading, getAllTask, tasks } = useTask();
   const { dataUser } = useAuth();
   // const { workspaces, loading: workspacesLoading } = useWorkspace();
-  const { getAllPeople, peoples, loading: peoplesLoading } = usePeople();
+  const { getAllPeople } = usePeople();
 
   const table = useReactTable({
     data: tasks || [],
@@ -87,32 +82,32 @@ export default function TasksPage() {
   });
 
   // Filter handlers
-  const handleAssigneeFilter = (value: string) => {
-    setAssigneeFilter(value);
-    if (value === "all") {
-      table.getColumn("user_id")?.setFilterValue(undefined);
-    } else {
-      table.getColumn("user_id")?.setFilterValue(value);
-    }
-  };
+  // const handleAssigneeFilter = (value: string) => {
+  //   setAssigneeFilter(value);
+  //   if (value === "all") {
+  //     table.getColumn("user_id")?.setFilterValue(undefined);
+  //   } else {
+  //     table.getColumn("user_id")?.setFilterValue(value);
+  //   }
+  // };
 
-  const handleWorkspaceFilter = (value: string) => {
-    setWorkspaceFilter(value);
-    if (value === "all") {
-      table.getColumn("workspace_id")?.setFilterValue(undefined);
-    } else {
-      table.getColumn("workspace_id")?.setFilterValue(value);
-    }
-  };
+  // const handleWorkspaceFilter = (value: string) => {
+  //   setWorkspaceFilter(value);
+  //   if (value === "all") {
+  //     table.getColumn("workspace_id")?.setFilterValue(undefined);
+  //   } else {
+  //     table.getColumn("workspace_id")?.setFilterValue(value);
+  //   }
+  // };
 
   // Reset all filters
-  const handleResetFilters = () => {
-    setAssigneeFilter("all");
-    setWorkspaceFilter("all");
-    table.getColumn("user_id")?.setFilterValue(undefined);
-    table.getColumn("workspace_id")?.setFilterValue(undefined);
-    table.getColumn("title")?.setFilterValue("");
-  };
+  // const handleResetFilters = () => {
+  //   setAssigneeFilter("all");
+  //   setWorkspaceFilter("all");
+  //   table.getColumn("user_id")?.setFilterValue(undefined);
+  //   table.getColumn("workspace_id")?.setFilterValue(undefined);
+  //   table.getColumn("title")?.setFilterValue("");
+  // };
 
   useEffect(() => {
     getAllTask();

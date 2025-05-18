@@ -149,8 +149,8 @@ export default function TasksEditPage() {
       </header>
       <div className="flex flex-1 flex-col gap-4 pb-28 px-4 pt-0">
         {loading ? (
-          <div className="border border-border w-full h-full flex items-center justify-center rounded-md">
-            Loading...
+          <div className="flex h-screen w-full items-center justify-center">
+            <div className="h-16 w-16 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
           </div>
         ) : (
           <>

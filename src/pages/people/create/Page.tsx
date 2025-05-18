@@ -47,7 +47,7 @@ const FormSchema = z
 export default function PeoplesCreatePage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const { loading, createPeople } = usePeople();
+  const { loading, createPeople, getAllPeople } = usePeople();
   const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -66,6 +66,7 @@ export default function PeoplesCreatePage() {
     const { success } = await createPeople(data);
     if (success) {
       navigate("/peoples");
+      getAllPeople();
     }
   }
 

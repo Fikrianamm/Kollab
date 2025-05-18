@@ -91,5 +91,6 @@ const usePeople: UseBoundStore<StoreApi<IPeopleStore>> = create((set, get) => ({
 const unsubscribe = usePeople.subscribe((state) => {
   console.log("State People:", state);
 });
+void unsubscribe
 
 export default usePeople;

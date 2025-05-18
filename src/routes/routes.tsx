@@ -21,15 +21,15 @@ import { createBrowserRouter } from "react-router";
 const router = createBrowserRouter([
   {
     path: "/",
-    Component: RootLayout,
+    element: <RootLayout />,
     children: [
-      { index: true, Component: LandingPage },
+      { index: true, element: <LandingPage /> },
       {
         path: "auth",
-        Component: AuthLayout,
+        element: <AuthLayout />,
         children: [
-          { path: "login", Component: LoginPage },
-          { path: "register", Component: RegisterPage },
+          { path: "login", element: <LoginPage /> },
+          { path: "register", element: <RegisterPage /> },
         ],
       },
       {

@@ -32,20 +32,11 @@ import {
 import { Button } from "./ui/button";
 import { Link, useNavigate } from "react-router";
 import useAuth from "@/stores/useAuth";
-import { useEffect } from "react";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
-  const { isAuthenticated, getUser, dataUser, logout, loading } = useAuth();
+  const { dataUser, logout, loading } = useAuth();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    getUser();
-  }, [getUser]);
-
-  useEffect(() => {
-    if (!isAuthenticated) navigate("/auth/login", { replace: true });
-  }, [isAuthenticated, navigate]);
 
   const handleLogout = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();

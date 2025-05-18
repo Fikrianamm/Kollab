@@ -130,17 +130,9 @@ export default function TasksCreatePage() {
 
   useEffect(() => {
     if (workspaceParams) {
-      form.reset({
-        workspace_id: workspaceParams,
-      });
-    }
-  }, []);
-
-  useEffect(() => {
-    if (workspaceParams) {
       form.setValue("workspace_id", workspaceParams);
     }
-  }, [workspaceParams]);
+  }, [workspaceParams, form]);
 
   return (
     <SidebarInset>
@@ -236,7 +228,7 @@ export default function TasksCreatePage() {
               name="priority"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>Priority</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
@@ -265,7 +257,7 @@ export default function TasksCreatePage() {
               name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>Status</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}

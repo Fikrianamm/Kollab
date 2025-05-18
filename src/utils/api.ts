@@ -11,7 +11,8 @@ import {
   RegisterData,
 } from "@/types/types";
 
-const baseUrl = "https://backend-kollab.vercel.app/api";
+// const baseUrl = "https://backend-kollab.vercel.app/api";
+const baseUrl = "http://localhost:3000/api";
 const api = axios.create({
   baseURL: baseUrl,
   withCredentials: true,

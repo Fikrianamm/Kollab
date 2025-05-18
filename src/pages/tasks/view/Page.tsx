@@ -19,7 +19,7 @@ import { z } from "zod";
 import ReactQuill from "react-quill-new";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { PriorityType, StatusType } from "@/types/types";
+import { PriorityType, StatusType, User } from "@/types/types";
 import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -58,27 +58,49 @@ import useAuth from "@/stores/useAuth";
 import { format } from "date-fns";
 
 function CommentCard({
+  id,
   avatar,
   username,
   description,
   created_at,
+  user,
 }: {
+  id: string;
   avatar: string;
   username: string;
   description: string;
   created_at: Date;
+  user?: User;
 }) {
+  const { deleteComment, loadingComment } = useTask();
+  const { dataUser } = useAuth();
+
   return (
     <div className="flex gap-4 items-start">
       <img src={avatar} alt={username} className="w-8 h-8 rounded-full" />
       <div className="flex flex-col flex-1 border border-border rounded-md">
-        <div className="flex gap-2 px-4 py-2 bg-blue-900/10 border-b rounded-t-md border-border items-center">
+        <div className="flex justify-between items-center px-4 py-2 bg-blue-900/10 border-b rounded-t-md border-border ">
           <div className="flex gap-2 items-center">
-            <p className="text-sm font-semibold text-foreground">{username}</p>
+            <div className="flex gap-2 items-center">
+              <p className="text-sm font-semibold text-foreground">
+                {username}
+              </p>
+            </div>
+            <p className="ml-1 font-normal text-muted-foreground text-sm">
+              {formatCreatedAt(created_at as Date)}
+            </p>
           </div>
-          <p className="ml-1 font-normal text-muted-foreground text-sm">
-            {formatCreatedAt(created_at as Date)}
-          </p>
+          {dataUser?.email === user?.email && (
+            <Button
+              type="button"
+              variant={"ghost"}
+              className="text-muted-foreground/50 hover:text-red-600"
+              onClick={() => deleteComment(id)}
+              disabled={loadingComment}
+            >
+              <Trash />
+            </Button>
+          )}
         </div>
         <div className="p-4">
           <p className="text-sm text-foreground">{parse(description)}</p>
@@ -226,7 +248,11 @@ export default function TasksViewPage() {
 
   const {
     task,
+    comment,
+    subtask,
     loading,
+    // loadingComment,
+    // loadingSubtask,
     getTask,
     createComment,
     createSubtask,
@@ -258,13 +284,7 @@ export default function TasksViewPage() {
   });
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    const { success } = await createComment(
-      data,
-      task?.id.toString() as string
-    );
-    if (success) {
-      getTask(task?.id.toString() as string);
-    }
+    await createComment(data, task?.id.toString() as string);
   }
 
   async function onSubmitSubtask(data: z.infer<typeof FormSchemaSubtask>) {
@@ -324,7 +344,8 @@ export default function TasksViewPage() {
     task?.subtask && task?.subtask?.length > 0
       ? Math.round((completedCount / task?.subtask?.length) * 100)
       : 0;
-  const formatedDateDeadline = task && format(task?.deadline as Date, "dd LLL yyyy");
+  const formatedDateDeadline =
+    task && format(task?.deadline as Date, "dd LLL yyyy");
   const parsedDesc = parse(task?.description || "");
 
   return (
@@ -367,7 +388,9 @@ export default function TasksViewPage() {
                 <Calendar size={16} />
                 <p className="text-xs md:text-sm font-normal">
                   Deadline
-                  <span className="text-red-500 ml-2">{formatedDateDeadline}</span>
+                  <span className="text-red-500 ml-2">
+                    {formatedDateDeadline}
+                  </span>
                 </p>
               </div>
             </div>
@@ -385,7 +408,7 @@ export default function TasksViewPage() {
                         className="w-7 h-7 rounded-full"
                       />
                       <p className="text-base font-semibold text-foreground">
-                        @{task?.user?.username}
+                        {task?.user?.username}
                       </p>
                     </div>
                   </div>
@@ -411,7 +434,7 @@ export default function TasksViewPage() {
                     </div>
                     <Progress value={progress} />
                     <div className="flex flex-col gap-2 mt-4">
-                      {task?.subtask?.map((subtask) => (
+                      {subtask?.map((subtask) => (
                         <div
                           key={subtask.id}
                           className="flex items-center justify-between"
@@ -438,7 +461,9 @@ export default function TasksViewPage() {
                             variant={"ghost"}
                             className="hover:bg-red-200/30! dark:hover:bg-red-500/10! hover:text-red-600!"
                             type="button"
-                            onClick={() => handleDeleteSubtask(String(subtask.id))}
+                            onClick={() =>
+                              handleDeleteSubtask(String(subtask.id))
+                            }
                           >
                             <Trash size={16} />
                           </Button>
@@ -485,12 +510,14 @@ export default function TasksViewPage() {
                     </div>
                   </div>
                 </div>
-                {task?.comment?.map((comment) => (
+                {comment?.map((comment) => (
                   <CommentCard
+                    id={comment?.id?.toString() as string}
                     avatar={comment?.user?.avatar as string}
                     username={comment?.user?.username as string}
                     description={comment?.comment as string}
                     created_at={comment?.date as Date}
+                    user={comment?.user}
                   />
                 ))}
                 {/* Comment input */}

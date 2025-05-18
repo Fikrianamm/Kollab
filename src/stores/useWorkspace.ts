@@ -4,7 +4,6 @@ import {
   IWorkspaceData,
   Response,
   StatusType,
-  Task,
   Workspace,
 } from "@/types/types";
 import {
@@ -12,7 +11,6 @@ import {
   deleteWorkspace,
   getAllWorkspace,
   getWorkspace,
-  updateTaskStatus as apiUpdateTaskStatus,
   updateWorkspace,
   updateTaskStatus,
 } from "@/utils/api";
@@ -285,5 +283,6 @@ const useWorkspace: UseBoundStore<StoreApi<IWorkspaceStore>> = create(
 const unsubscribe = useWorkspace.subscribe((state) => {
   console.log("State Workspace:", state);
 });
+void unsubscribe
 
 export default useWorkspace;

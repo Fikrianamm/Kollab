@@ -42,9 +42,7 @@ function DropdownAction({ row }: { row: Row<Task> }) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <Link
-            to={`/workspaces/${task.workspace_id}/task/${task.id}`}
-          >
+          <Link to={`/workspaces/${task.workspace_id}/task/${task.id}`}>
             <DropdownMenuItem>
               <Eye />
               View
@@ -124,10 +122,27 @@ export const columns: ColumnDef<Task>[] = [
     },
   },
   {
-    accessorKey: "user.name",
+    accessorFn: (row) => row.user,
+    id: "assignedTo",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Assigned To" />
     ),
+    cell: ({ row }) => {
+      const user = row.getValue("assignedTo") as {
+        name: string;
+        avatar: string;
+      };
+      return (
+        <div className="flex gap-2 items-center justify-start">
+          <img
+            src={user.avatar}
+            alt={user.name}
+            className="w-6 h-6 rounded-full object-fit-cover"
+          />
+          <p>{user.name}</p>
+        </div>
+      );
+    },
   },
   {
     accessorKey: "deadline",

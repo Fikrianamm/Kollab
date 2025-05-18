@@ -107,7 +107,7 @@ body {
 }
 
 .dark {
-  --background: oklch(20.19% 0.027 267.78); /* Dark primary background */
+  --background: #020617; /* Dark primary background */
   --foreground: oklch(0.985 0 0); /* Hampir putih */
 
   --card: oklch(24% 0.02 267.78);
@@ -143,7 +143,7 @@ body {
   --chart-5: oklch(58% 0.22 16.439);
 
   /* Sidebar */
-  --sidebar: oklch(20.19% 0.027 267.78);
+  --sidebar: #020617;
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(50% 0.23 264.376);
   --sidebar-primary-foreground: oklch(0.985 0 0);

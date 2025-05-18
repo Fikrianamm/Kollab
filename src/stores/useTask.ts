@@ -1,5 +1,12 @@
 import { toast } from "@/hooks/use-toast";
-import { ICommentData, ITaskData, Response, Task } from "@/types/types";
+import {
+  Comment,
+  ICommentData,
+  ITaskData,
+  Response,
+  SubTask,
+  Task,
+} from "@/types/types";
 import {
   createComment,
   createSubtask,
@@ -14,12 +21,16 @@ import {
 } from "@/utils/api";
 import getErrorMessage from "@/utils/error";
 import { create, StoreApi, UseBoundStore } from "zustand";
+import useAuth from "./useAuth";
 
 interface ITaskStore {
-  tasks: Task[] | null;
+  tasks: Task[] | [];
   task: Task | null;
+  comment: Comment[] | [];
+  subtask: SubTask[] | [];
   loading: boolean;
   loadingComment: boolean;
+  loadingSubtask: boolean;
   getAllTask: () => Promise<Response<Task[]>>;
   getTask: (id: string) => Promise<Response<Task>>;
   createTask: (taskData: ITaskData, id: string) => Promise<Response<null>>;
@@ -43,10 +54,13 @@ interface ITaskStore {
 }
 
 const useTask: UseBoundStore<StoreApi<ITaskStore>> = create((set, get) => ({
-  tasks: null,
+  tasks: [],
   task: null,
+  comment: [],
+  subtask: [],
   loading: false,
   loadingComment: false,
+  loadingSubtask: false,
   getAllTask: async () => {
     try {
       set(() => ({ loading: true }));
@@ -73,6 +87,9 @@ const useTask: UseBoundStore<StoreApi<ITaskStore>> = create((set, get) => ({
       }
 
       set(() => ({ task: data }));
+      set(() => ({ comment: data.comment }));
+      set(() => ({ subtask: data.subtask }));
+
       return { message, success: true };
     } catch (error) {
       const message = getErrorMessage(error);
@@ -161,20 +178,33 @@ const useTask: UseBoundStore<StoreApi<ITaskStore>> = create((set, get) => ({
     }));
   },
   createComment: async (commentData: ICommentData, taskId: string) => {
+    const prevComment = get().comment;
     try {
-      set(() => ({ loading: true }));
+      set(() => ({ loadingComment: true }));
+
+      const { dataUser } = useAuth.getState();
+
+      const newComment = {
+        id: Math.random(),
+        comment: commentData.comment,
+        user: dataUser,
+        date: new Date(),
+      };
+
+      set((state) => ({
+        comment: [...state.comment, newComment as Comment],
+      }));
 
       const { success, message } = await createComment(commentData, taskId);
       if (!success) {
         throw new Error(message);
       }
 
-      toast({
-        title: "Comment Created",
-        description: "You’ve successfully added a new comment.",
-      });
       return { message, success: true };
     } catch (error) {
+      set(() => ({
+        comment: prevComment,
+      }));
       const message = getErrorMessage(error);
       toast({
         variant: "destructive",
@@ -183,24 +213,28 @@ const useTask: UseBoundStore<StoreApi<ITaskStore>> = create((set, get) => ({
       });
       return { message, success: false };
     } finally {
-      set(() => ({ loading: false }));
+      set(() => ({ loadingComment: false }));
     }
   },
   deleteComment: async (id: string) => {
+    const prevComment = get().comment;
     try {
-      set(() => ({ loading: true }));
+      set(() => ({ loadingComment: true }));
+
+      set((state) => ({
+        comment: state.comment.filter((c) => c.id?.toString() !== id),
+      }));
 
       const { success, message } = await deleteComment(id);
       if (!success) {
         throw new Error(message);
       }
 
-      toast({
-        title: "Comment Deleted",
-        description: "You’ve successfully deleted the comment.",
-      });
       return { message, success: true };
     } catch (error) {
+      set(() => ({
+        comment: prevComment,
+      }));
       const message = getErrorMessage(error);
       toast({
         variant: "destructive",
@@ -209,12 +243,15 @@ const useTask: UseBoundStore<StoreApi<ITaskStore>> = create((set, get) => ({
       });
       return { message, success: false };
     } finally {
-      set(() => ({ loading: false }));
+      set(() => ({ loadingComment: false }));
     }
   },
-  createSubtask: async (subtaskData: { description: string }, taskId: string) => {
+  createSubtask: async (
+    subtaskData: { description: string },
+    taskId: string
+  ) => {
     try {
-      set(() => ({ loading: true }));
+      set(() => ({ loadingSubtask: true }));
 
       const { success, message } = await createSubtask(subtaskData, taskId);
       if (!success) {
@@ -235,22 +272,21 @@ const useTask: UseBoundStore<StoreApi<ITaskStore>> = create((set, get) => ({
       });
       return { message, success: false };
     } finally {
-      set(() => ({ loading: false }));
+      set(() => ({ loadingSubtask: false }));
     }
   },
-  updateSubtask: async (subtaskData: { is_complete: boolean }, subtaskId: string) => {
+  updateSubtask: async (
+    subtaskData: { is_complete: boolean },
+    subtaskId: string
+  ) => {
     try {
-      set(() => ({ loading: true }));
+      set(() => ({ loadingSubtask: true }));
 
       const { success, message } = await updateSubtask(subtaskData, subtaskId);
       if (!success) {
         throw new Error(message);
       }
 
-      toast({
-        title: "Subtask Updated",
-        description: "You’ve successfully updated a subtask.",
-      });
       return { message, success: true };
     } catch (error) {
       const message = getErrorMessage(error);
@@ -261,22 +297,18 @@ const useTask: UseBoundStore<StoreApi<ITaskStore>> = create((set, get) => ({
       });
       return { message, success: false };
     } finally {
-      set(() => ({ loading: false }));
+      set(() => ({ loadingSubtask: false }));
     }
   },
   deleteSubtask: async (id: string) => {
     try {
-      set(() => ({ loading: true }));
+      set(() => ({ loadingSubtask: true }));
 
       const { success, message } = await deleteSubtask(id);
       if (!success) {
         throw new Error(message);
       }
 
-      toast({
-        title: "Subtask Deleted",
-        description: "You’ve successfully deleted the subtask.",
-      });
       return { message, success: true };
     } catch (error) {
       const message = getErrorMessage(error);
@@ -287,7 +319,7 @@ const useTask: UseBoundStore<StoreApi<ITaskStore>> = create((set, get) => ({
       });
       return { message, success: false };
     } finally {
-      set(() => ({ loading: false }));
+      set(() => ({ loadingSubtask: false }));
     }
   },
 }));
@@ -297,5 +329,6 @@ const useTask: UseBoundStore<StoreApi<ITaskStore>> = create((set, get) => ({
 const unsubscribe = useTask.subscribe((state) => {
   console.log("State Auth:", state);
 });
+void unsubscribe;
 
 export default useTask;

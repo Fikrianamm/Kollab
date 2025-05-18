@@ -1,48 +1,77 @@
-import React from "react";
-import { Construction, Wrench } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import React, { useEffect } from "react";
+import useAuth from "@/stores/useAuth";
+import { useTheme } from "@/components/theme-provider";
+import { Button } from "@/components/ui/button";
+import { MoveRight } from "lucide-react";
+import { Link } from "react-router";
 
 const LandingPage: React.FC = () => {
+  const { getUser, dataUser } = useAuth();
+  const { theme } = useTheme();
+  const logoSrc = theme === "light" ? "/LogoDark.svg" : "/LogoLight.svg";
+
+  useEffect(() => {
+    getUser();
+  }, [getUser]);
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-slate-950 text-slate-50 px-4 py-10">
-      <div className="max-w-md w-full mx-auto">
-        <div className="flex justify-center mb-8">
-          <div className="relative">
-            <Construction className="text-blue-400 h-20 w-20 animate-pulse" />
-            <Wrench
-              className="absolute -top-2 -right-2 text-amber-500 h-8 w-8 animate-spin"
-              style={{ animationDuration: "3s" }}
+    <div className="relative flex flex-col min-h-screen h-full min-w-screen bg-background text-foreground px-4 md:px-8 py-4 overflow-x-hidden">
+      <img
+        src="/blob.svg"
+        alt="blob"
+        className="absolute top-0 z-0 blur-3xl opacity-25 h-screen"
+      />
+      {/* header */}
+      <div className="flex justify-between items-center w-full">
+        <img alt="Kollab Logo" className="w-16 md:w-20" src={logoSrc} />
+        {dataUser ? (
+          <Link
+            to={"/dashboard"}
+            className="flex items-center gap-2 text-xs md:text-sm cursor-pointer"
+          >
+            Dashboard
+            <MoveRight size={12} />
+          </Link>
+        ) : (
+          <Link
+            to={"/auth/login"}
+            className="flex items-center gap-2 text-xs md:text-sm cursor-pointer"
+          >
+            Login
+            <MoveRight size={12} />
+          </Link>
+        )}
+      </div>
+
+      {/* headline */}
+      <div className="flex flex-col gap-2 w-3/4 md:w-1/2 mx-auto mt-32 md:mt-36 z-50">
+        <h1 className="font-bold text-3xl md:text-5xl text-foreground text-center">
+          Visualize Your Workflow. Simplify Your Process.
+        </h1>
+        <p className="text-muted-foreground text-center text-sm md:text-base mt-2 md:mt-4">
+          Where clarity meets productivity. With our powerful Kanban Board, you
+          can easily manage tasks, assign priorities, and keep your team
+          aligned. Streamline workflows, monitor progress in real-time, and
+          bring your projects to life all in one place.
+        </p>
+        <Button variant={"blue"} className="w-max mx-auto mt-2 md:mt-4">
+          Get Started
+        </Button>
+      </div>
+
+      {/* Preview Feature */}
+      <div>
+        <div className="relative mx-auto border-gray-800 dark:border-gray-800 bg-gray-800 border-[8px] rounded-t-xl h-[172px] max-w-[301px] md:h-[512px] md:max-w-5xl mt-12">
+          <div className="rounded-lg overflow-hidden h-[156px] md:h-[498px] bg-white dark:bg-gray-800">
+            <img
+              src="preview.png"
+              className="h-[156px] md:h-[498px] w-full rounded-lg"
+              alt=""
             />
           </div>
         </div>
-
-        <Card className="border-slate-800 bg-slate-900 shadow-lg">
-          <CardContent className="pt-6">
-            <h1 className="text-3xl font-bold mb-4 text-white">
-              <span className="text-blue-400">Kollab</span> Under Construction
-            </h1>
-
-            <p className="text-slate-300 mb-6">
-              We are building the best collaboration platform that will
-              revolutionize the way you work with your team.
-            </p>
-
-            <Alert className="bg-slate-800 border-blue-900 text-left mb-6">
-              <AlertTitle className="text-blue-400 flex items-center gap-2">
-                <Wrench className="h-4 w-4" /> Project Status
-              </AlertTitle>
-              <AlertDescription className="text-slate-300">
-                Website under construction. Please check back later to see our
-                finished platform.
-              </AlertDescription>
-            </Alert>
-
-          </CardContent>
-        </Card>
-
-        <div className="text-slate-500 mt-6 text-center text-sm">
-          &copy; {new Date().getFullYear()} Kollab. All rights reserved.
+        <div className="relative mx-auto bg-gray-900 dark:bg-gray-700 rounded-b-xl rounded-t-sm h-[17px] max-w-[351px] md:h-[21px] md:max-w-[1124px]">
+          <div className="absolute left-1/2 top-0 -translate-x-1/2 rounded-b-xl w-[56px] h-[5px] md:w-[96px] md:h-[8px] bg-gray-800"></div>
         </div>
       </div>
     </div>

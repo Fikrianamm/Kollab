@@ -193,4 +193,6 @@ const unsubscribe = useAuth.subscribe((state) => {
   console.log("State Auth:", state);
 });
 
+void unsubscribe
+
 export default useAuth;

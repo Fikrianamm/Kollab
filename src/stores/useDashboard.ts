@@ -76,5 +76,6 @@ const useDashboard: UseBoundStore<StoreApi<IDashboardStore>> = create(
 const unsubscribe = useDashboard.subscribe((state) => {
   console.log("State Dashboard:", state);
 });
+void unsubscribe
 
 export default useDashboard;

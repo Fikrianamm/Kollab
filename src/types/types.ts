@@ -57,8 +57,8 @@ export interface Task {
 
 // SubTask Interface
 export interface SubTask {
-  id: number;
-  task_id: number;
+  id?: number;
+  task_id?: number;
   is_complete: boolean;
   description: string;
   task?: Task[];
@@ -66,9 +66,9 @@ export interface SubTask {
 
 // Comment Interface
 export interface Comment {
-  id: number;
-  task_id: number;
-  user_id: number;
+  id?: number;
+  task_id?: number;
+  user_id?: number;
   comment: string;
   date: Date;
   user?: User;
