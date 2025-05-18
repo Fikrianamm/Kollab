@@ -56,6 +56,7 @@ import useTask from "@/stores/useTask";
 import useWorkspace from "@/stores/useWorkspace";
 import useAuth from "@/stores/useAuth";
 import { format } from "date-fns";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function CommentCard({
   id,
@@ -375,9 +376,64 @@ export default function TasksViewPage() {
       </header>
       <div className="flex flex-1 flex-col gap-4 pb-28 px-4 pt-0">
         {loading ? (
-          <div className="border border-border w-full h-full flex items-center justify-center rounded-md">
-            Loading...
-          </div>
+          <>
+            <div className="flex flex-col gap-2">
+              <Skeleton className="w-4/5 h-5" />
+              <Skeleton className="w-2/5 h-4" />
+            </div>
+            {/* grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 md:gap-4 mt-2 md:mt-4">
+              {/* information task */}
+              <div className="flex flex-col col-span-2 gap-4">
+                {/* description task */}
+                <Skeleton className="w-full h-52" />
+                <div className="flex gap-4">
+                  <Skeleton className="w-8 h-8 rounded-full" />
+                  <Skeleton className="w-full h-40" />
+                </div>
+                <div className="flex gap-4">
+                  <Skeleton className="w-8 h-8 rounded-full" />
+                  <Skeleton className="w-full h-40" />
+                </div>
+              </div>
+              {/* settings task */}
+              <div className="flex-col flex gap-2 mt-4 md:mt-0">
+                {/* assignees */}
+                <div className="flex flex-col">
+                  <div className="flex justify-between items-center">
+                    <Skeleton className="w-2/5 h-5 mb-2" />
+                  </div>
+                  <div className="flex gap-3 items-center">
+                    <Skeleton className="w-6 h-6 rounded-full" />
+                    <Skeleton className="w-2/5 h-3" />
+                  </div>
+                </div>
+                <Separator className="mt-2" />
+
+                {/* priority */}
+                <div className="flex flex-col gap-2">
+                  <div className="flex justify-between items-center">
+                    <Skeleton className="w-2/5 h-5 mb-2" />
+                  </div>
+                  <div className="flex gap-3 items-center">
+                    <Skeleton className="w-4/5 h-4" />
+                  </div>
+                </div>
+                <Separator className="mt-2" />
+
+                {/* status */}
+                <div className="flex flex-col gap-2">
+                  <div className="flex justify-between items-center">
+                    <Skeleton className="w-2/5 h-5 mb-2" />
+                  </div>
+                  <div className="flex gap-3 items-center">
+                    <Skeleton className="w-4/5 h-4" />
+                  </div>
+                </div>
+                <Separator className="mt-2" />
+              </div>
+            </div>
+          </>
         ) : (
           <>
             <div className="flex flex-col gap-2">

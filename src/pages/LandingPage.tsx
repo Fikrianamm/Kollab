@@ -3,12 +3,13 @@ import useAuth from "@/stores/useAuth";
 import { useTheme } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
 import { MoveRight } from "lucide-react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 const LandingPage: React.FC = () => {
   const { getUser, dataUser } = useAuth();
   const { theme } = useTheme();
   const logoSrc = theme === "light" ? "/LogoDark.svg" : "/LogoLight.svg";
+  const navigate = useNavigate();
 
   useEffect(() => {
     getUser();
@@ -22,7 +23,7 @@ const LandingPage: React.FC = () => {
         className="absolute top-0 z-0 blur-3xl opacity-25 h-screen"
       />
       {/* header */}
-      <div className="flex justify-between items-center w-full">
+      <div className="flex justify-between items-center w-full z-50">
         <img alt="Kollab Logo" className="w-16 md:w-20" src={logoSrc} />
         {dataUser ? (
           <Link
@@ -54,7 +55,11 @@ const LandingPage: React.FC = () => {
           aligned. Streamline workflows, monitor progress in real-time, and
           bring your projects to life all in one place.
         </p>
-        <Button variant={"blue"} className="w-max mx-auto mt-2 md:mt-4">
+        <Button
+          variant={"blue"}
+          className="w-max mx-auto mt-2 md:mt-4"
+          onClick={() => navigate("/auth/login")}
+        >
           Get Started
         </Button>
       </div>
