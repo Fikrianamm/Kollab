@@ -16,7 +16,7 @@ const LandingPage: React.FC = () => {
   }, [getUser]);
 
   return (
-    <div className="relative flex flex-col min-h-screen h-full min-w-screen bg-background text-foreground px-4 md:px-8 py-4 overflow-x-hidden">
+    <div className="relative flex flex-col min-h-screen h-full max-w-screen bg-background text-foreground px-4 md:px-8 py-4 overflow-x-hidden pb-40">
       <img
         src="/blob.svg"
         alt="blob"
@@ -70,19 +70,12 @@ const LandingPage: React.FC = () => {
       </div>
 
       {/* Preview Feature */}
-      <div>
-        <div className="relative mx-auto border-gray-800 dark:border-gray-800 bg-gray-800 border-[8px] rounded-t-xl h-[172px] max-w-[301px] md:h-[512px] md:max-w-5xl mt-12">
-          <div className="rounded-lg overflow-hidden h-[156px] md:h-[498px] bg-white dark:bg-gray-800">
-            <img
-              src="preview.png"
-              className="h-[156px] md:h-[498px] w-full rounded-lg"
-              alt=""
-            />
-          </div>
-        </div>
-        <div className="relative mx-auto bg-gray-900 dark:bg-gray-700 rounded-b-xl rounded-t-sm h-[17px] max-w-[351px] md:h-[21px] md:max-w-[1124px]">
-          <div className="absolute left-1/2 top-0 -translate-x-1/2 rounded-b-xl w-[56px] h-[5px] md:w-[96px] md:h-[8px] bg-gray-800"></div>
-        </div>
+      <div className="z-50 w-full md:w-10/12 mx-auto flex flex-col items-center">
+        <img
+          src="preview.png"
+          className="w-full mt-12 rounded-md md:rounded-lg"
+          alt="preview app"
+        />
       </div>
     </div>
   );

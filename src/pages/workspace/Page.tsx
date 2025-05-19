@@ -25,7 +25,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { Eye, MoreHorizontal, PenLine, Plus, Trash2 } from "lucide-react";
+import {
+  Eye,
+  MoreHorizontal,
+  PenLine,
+  Plus,
+  SquareCheck,
+  Trash2,
+} from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router";
 import {
   DndContext,
@@ -52,9 +59,12 @@ import { CSS } from "@dnd-kit/utilities";
 import useWorkspace from "@/stores/useWorkspace";
 import { getAllWorkspace } from "@/utils/api";
 import useTask from "@/stores/useTask";
-import { StatusType, Task } from "@/types/types";
+import { PriorityType, StatusType, Task } from "@/types/types";
 import { transformWorkspaceTasks } from "@/utils/transformWorkspaceTasks";
 import useAuth from "@/stores/useAuth";
+import { PriorityTaskBadge } from "@/components/badge";
+import { formatDistance, isBefore } from "date-fns";
+import { Progress } from "@/components/ui/progress";
 
 export interface Container {
   id: StatusType;
@@ -204,6 +214,21 @@ function SortableItem({ id, task }: { id: UniqueIdentifier; task: Task }) {
 
   const parsedDesc = parse(task.description || "");
 
+  const today = new Date();
+  const deadline = task.deadline;
+
+  let displayText = "";
+
+  if (isBefore(deadline, today)) {
+    displayText = "Overdue";
+  } else {
+    displayText = formatDistance(deadline, today, { addSuffix: true });
+  }
+
+  const completedCount =
+    task?.subtask?.filter((obj) => obj.is_complete).length || 0;
+  const lengthSubtask = task?.subtask?.length || 0;
+
   return (
     <li
       ref={setNodeRef}
@@ -214,15 +239,44 @@ function SortableItem({ id, task }: { id: UniqueIdentifier; task: Task }) {
       }`}
       style={style}
     >
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center mb-2">
         <h3 className="font-medium text-foreground line-clamp-2">
           {task.title}
         </h3>
         <OptionMenuTask task={task} />
       </div>
+      <div className="flex justify-between items-center">
+        <div className="flex gap-2 items-center flex-wrap">
+          <img
+            src={task.user?.avatar}
+            alt={task.user?.username}
+            className="w-5 h-5 rounded-full"
+          />
+          <p className="text-muted-foreground text-xs">{task.user?.username}</p>
+        </div>
+        <PriorityTaskBadge priority={task?.priority as PriorityType} />
+      </div>
       <div className="mt-2 text-sm text-muted-foreground line-clamp-2">
         {parsedDesc}
       </div>
+      {lengthSubtask > 0 ? (
+        <>
+          <div className="flex justify-between items-center mt-2">
+            <p className="text-xs text-muted-foreground flex items-center">
+              <SquareCheck size={14} className="mr-1" />
+              <span className="text-blue-600">{completedCount}</span>/
+              {lengthSubtask} completed
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {(completedCount / lengthSubtask) * 100}%
+            </p>
+          </div>
+          <Progress className="my-2" />
+          <p className="text-xs text-orange-600">{displayText}</p>
+        </>
+      ) : (
+        <p className="text-xs text-orange-600 mt-2">{displayText}</p>
+      )}
     </li>
   );
 }
@@ -240,7 +294,7 @@ function DroppableContainer({
     id,
   });
   return (
-    <div ref={setNodeRef} className="flex flex-col w-full">
+    <div ref={setNodeRef} className="flex flex-col min-w-[180px] md:w-full">
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-semibold text-muted-foreground">{title}</h2>
         <Plus
@@ -598,7 +652,7 @@ export default function WorkspacePage() {
               collisionDetection={closestCorners}
               sensors={sensors}
             >
-              <div className="flex gap-4 min-w-max md:min-w-0">
+              <div className="flex gap-4 w-full md:min-w-0">
                 {containers.map((container) => (
                   <DroppableContainer
                     key={container.id}
