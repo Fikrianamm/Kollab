@@ -119,13 +119,14 @@ export interface ICreatePerson extends User {
 }
 
 export interface ITaskData {
-  user_id: string;
-  title: string;
-  deadline: Date;
-  priority: string;
-  status: string;
-  description: string;
+  user_id?: string;
+  title?: string;
+  deadline?: Date;
+  priority?: string;
+  status?: string;
+  description?: string;
   subtask?: SubTask[];
+  user?: User | null;
 }
 
 export interface ISubtaskData {

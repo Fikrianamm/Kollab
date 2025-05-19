@@ -9,7 +9,6 @@ import {
 import { Form, FormField, FormItem } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { users } from "@/dummy/data";
 import formatCreatedAt from "@/utils/format";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Calendar, Plus, Settings, Trash } from "lucide-react";
@@ -57,6 +56,7 @@ import useWorkspace from "@/stores/useWorkspace";
 import useAuth from "@/stores/useAuth";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
+import usePeople from "@/stores/usePeople";
 
 function CommentCard({
   id,
@@ -122,6 +122,14 @@ const FormSchemaSubtask = z.object({
 export function AssigneesSelector() {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
+  const { peoples } = usePeople();
+  const { assignedTo, task, updateAssigned } = useTask();
+
+  useEffect(() => {
+    if (assignedTo) {
+      setValue(String(assignedTo.id));
+    }
+  }, [assignedTo]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -136,15 +144,30 @@ export function AssigneesSelector() {
           <CommandList>
             <CommandEmpty>No user found.</CommandEmpty>
             <CommandGroup>
-              {users.map((user) => (
+              {peoples?.map((user) => (
                 <CommandItem
                   key={user.id}
                   value={String(user.id)}
                   onSelect={(currentValue) => {
-                    setValue(currentValue === value ? "" : currentValue);
+                    const newValue = currentValue === value ? "" : currentValue;
+                    setValue(newValue);
                     setOpen(false);
+
+                    const selectedUser = newValue
+                      ? peoples?.find((user) => String(user.id) === newValue)
+                      : null;
+
+                    updateAssigned(
+                      { user_id: newValue, user: selectedUser },
+                      task?.id.toString() as string
+                    );
                   }}
                 >
+                  <img
+                    src={user.avatar}
+                    alt={user.username}
+                    className="w-5 h-5 rounded-full"
+                  />
                   {user.username}
                   <Check
                     className={cn(
@@ -162,12 +185,8 @@ export function AssigneesSelector() {
   );
 }
 
-export function PriorityDropdown({
-  currPriorityTask,
-}: {
-  currPriorityTask: PriorityType;
-}) {
-  const [priority, setPriority] = useState<PriorityType>(currPriorityTask);
+export function PriorityDropdown() {
+  const { priority, updatePriority, task } = useTask();
 
   return (
     <DropdownMenu>
@@ -181,7 +200,10 @@ export function PriorityDropdown({
         <DropdownMenuSeparator />
         <DropdownMenuRadioGroup
           value={priority}
-          onValueChange={(value) => setPriority(value as PriorityType)}
+          onValueChange={(value) => {
+            updatePriority({ priority: value }, task?.id.toString() as string);
+            
+          }}
         >
           <DropdownMenuRadioItem value="urgent">
             <PriorityTaskBadge priority="urgent" />
@@ -204,12 +226,8 @@ export function PriorityDropdown({
   );
 }
 
-export function StatusDropdown({
-  currStatusTask,
-}: {
-  currStatusTask: StatusType;
-}) {
-  const [status, setStatus] = useState<StatusType>(currStatusTask);
+export function StatusDropdown() {
+  const { status, updateStatus, task } = useTask();
 
   return (
     <DropdownMenu>
@@ -223,7 +241,9 @@ export function StatusDropdown({
         <DropdownMenuSeparator />
         <DropdownMenuRadioGroup
           value={status}
-          onValueChange={(value) => setStatus(value as StatusType)}
+          onValueChange={(value) => {
+            updateStatus({ status: value }, task?.id.toString() as string);
+          }}
         >
           <DropdownMenuRadioItem value="to do">
             <StatusTaskBadge status="to do" />
@@ -246,19 +266,21 @@ export function StatusDropdown({
 export default function TasksViewPage() {
   const { dataUser } = useAuth();
   const { idTask, idWorkspace } = useParams();
+  const { getAllPeople } = usePeople();
 
   const {
     task,
     comment,
     subtask,
     loading,
-    // loadingComment,
-    // loadingSubtask,
     getTask,
     createComment,
     createSubtask,
     deleteSubtask,
     updateSubtask,
+    assignedTo,
+    priority,
+    status,
   } = useTask();
   const { workspaces } = useWorkspace();
   const currWorkspace = workspaces?.find(
@@ -289,61 +311,38 @@ export default function TasksViewPage() {
   }
 
   async function onSubmitSubtask(data: z.infer<typeof FormSchemaSubtask>) {
+    formSubtask.reset({
+      description: "",
+    });
+    setIsAddingSubtask(false);
     const { success } = await createSubtask(
       data,
       task?.id.toString() as string
     );
-    if (success) {
-      getTask(task?.id.toString() as string);
+    if (!success) {
       formSubtask.reset({
-        description: "",
+        description: data.description,
       });
-      setIsAddingSubtask(false);
+      setIsAddingSubtask(true);
     }
   }
 
   async function handleCheckedChange(subtaskId: string, is_complete: boolean) {
-    const { success } = await updateSubtask(
-      { is_complete: !is_complete },
-      subtaskId
-    );
-    if (success) {
-      getTask(task?.id.toString() as string);
-    }
-  }
-
-  // const addSubtask = () => {
-  //   if (newSubtask.trim()) {
-  //     setSubtasks([
-  //       ...subtasks,
-  //       {
-  //         id: 20,
-  //         description: newSubtask,
-  //         is_complete: false,
-  //         task_id: task?.id as number,
-  //       },
-  //     ]);
-  //     setNewSubtask("");
-  //     setIsAddingSubtask(false);
-  //   }
-  // };
-
-  async function handleDeleteSubtask(subtaskId: string) {
-    const { success } = await deleteSubtask(subtaskId);
-    if (success) {
-      getTask(task?.id.toString() as string);
-    }
+    await updateSubtask({ is_complete: !is_complete }, subtaskId);
   }
 
   useEffect(() => {
     getTask(idTask as string);
   }, [getTask, idTask]);
 
-  const completedCount =
-    task?.subtask?.filter((obj) => obj.is_complete).length || 0;
+  useEffect(() => {
+    getAllPeople();
+  }, [getAllPeople]);
+
+  const completedCount = subtask?.filter((obj) => obj.is_complete).length || 0;
   const progress =
-    task?.subtask && task?.subtask?.length > 0
-      ? Math.round((completedCount / task?.subtask?.length) * 100)
+    subtask && subtask?.length > 0
+      ? Math.round((completedCount / subtask?.length) * 100)
       : 0;
   const formatedDateDeadline =
     task && format(task?.deadline as Date, "dd LLL yyyy");
@@ -360,7 +359,7 @@ export default function TasksViewPage() {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href={`/workspaces/${task?.workspace?.id}`}>
+                <BreadcrumbLink href={`/workspaces/${task?.workspace_id}`}>
                   {currWorkspace?.name}
                 </BreadcrumbLink>
               </BreadcrumbItem>
@@ -458,13 +457,16 @@ export default function TasksViewPage() {
                 <div className="flex flex-col border border-border rounded-md mb-4">
                   <div className="flex flex-wrap gap-2 px-4 py-2 bg-blue-900/10 border-b border-border items-center">
                     <div className="flex gap-2 items-center">
+                      <p className="text-muted-foreground text-sm">
+                        Assigned to
+                      </p>
                       <img
-                        src={task?.user?.avatar}
-                        alt={task?.user?.username}
+                        src={assignedTo?.avatar}
+                        alt={assignedTo?.username}
                         className="w-7 h-7 rounded-full"
                       />
                       <p className="text-base font-semibold text-foreground">
-                        {task?.user?.username}
+                        {assignedTo?.username}
                       </p>
                     </div>
                   </div>
@@ -517,9 +519,7 @@ export default function TasksViewPage() {
                             variant={"ghost"}
                             className="hover:bg-red-200/30! dark:hover:bg-red-500/10! hover:text-red-600!"
                             type="button"
-                            onClick={() =>
-                              handleDeleteSubtask(String(subtask.id))
-                            }
+                            onClick={() => deleteSubtask(String(subtask.id))}
                           >
                             <Trash size={16} />
                           </Button>
@@ -644,19 +644,16 @@ export default function TasksViewPage() {
                     <p className="text-muted-foreground text-sm mb-2">
                       Assignees
                     </p>
-                    {/* <Button variant={"ghost"} type="button">
-                  <Settings />
-                </Button> */}
-                    {/* <AssigneesSelector /> */}
+                    <AssigneesSelector />
                   </div>
                   <div className="flex gap-3 items-center">
                     <img
-                      src={task?.user?.avatar}
-                      alt={task?.user?.username}
+                      src={assignedTo?.avatar}
+                      alt={assignedTo?.username}
                       className="w-6 h-6 rounded-full"
                     />
                     <p className="text-foreground text-sm">
-                      {task?.user?.username}
+                      {assignedTo?.username}
                     </p>
                   </div>
                 </div>
@@ -666,14 +663,10 @@ export default function TasksViewPage() {
                 <div className="flex flex-col gap-2">
                   <div className="flex justify-between items-center">
                     <p className="text-muted-foreground text-sm">Priority</p>
-                    {/* <PriorityDropdown
-                      currPriorityTask={task?.priority as PriorityType}
-                    /> */}
+                    <PriorityDropdown />
                   </div>
                   <div>
-                    <PriorityTaskBadge
-                      priority={task?.priority as PriorityType}
-                    />
+                    <PriorityTaskBadge priority={priority as PriorityType} />
                   </div>
                 </div>
                 <Separator className="mt-2" />
@@ -682,12 +675,10 @@ export default function TasksViewPage() {
                 <div className="flex flex-col gap-2">
                   <div className="flex justify-between items-center">
                     <p className="text-muted-foreground text-sm">Status</p>
-                    {/* <StatusDropdown
-                      currStatusTask={task?.status as StatusType}
-                    /> */}
+                    <StatusDropdown />
                   </div>
                   <div>
-                    <StatusTaskBadge status={task?.status as StatusType} />
+                    <StatusTaskBadge status={status as StatusType} />
                   </div>
                 </div>
                 <Separator className="mt-2" />

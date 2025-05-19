@@ -298,9 +298,9 @@ export async function createSubtask(
       `${baseUrl}/createsubtask/${task_id}`,
       subtaskData
     );
-    const { message, success } = response.data;
+    const { message, success, data } = response.data;
     if (success) {
-      return { message, success };
+      return { message, success, data };
     }
     throw new Error(message);
   } catch (error) {
