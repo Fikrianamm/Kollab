@@ -164,13 +164,13 @@ body {
 
 /* style quill text editor */
 .ql-editor {
-  background-color: var(--background); 
+  background-color: var(--background);
   border-radius: 0 0 4px 4px !important;
   border-top: 0;
 }
 
 .ql-toolbar {
-  background-color: transparent; 
+  background-color: transparent;
   border: 1px solid var(--border) !important;
   border-radius: 4px 4px 0 0;
   border-bottom: 0;

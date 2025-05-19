@@ -202,7 +202,6 @@ export function PriorityDropdown() {
           value={priority}
           onValueChange={(value) => {
             updatePriority({ priority: value }, task?.id.toString() as string);
-            
           }}
         >
           <DropdownMenuRadioItem value="urgent">
@@ -644,7 +643,7 @@ export default function TasksViewPage() {
                     <p className="text-muted-foreground text-sm mb-2">
                       Assignees
                     </p>
-                    <AssigneesSelector />
+                    {dataUser?.role === "Leader" && <AssigneesSelector />}
                   </div>
                   <div className="flex gap-3 items-center">
                     <img
@@ -663,7 +662,7 @@ export default function TasksViewPage() {
                 <div className="flex flex-col gap-2">
                   <div className="flex justify-between items-center">
                     <p className="text-muted-foreground text-sm">Priority</p>
-                    <PriorityDropdown />
+                    {dataUser?.role === "Leader" && <PriorityDropdown />}
                   </div>
                   <div>
                     <PriorityTaskBadge priority={priority as PriorityType} />

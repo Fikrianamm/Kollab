@@ -27,10 +27,12 @@ import {
 } from "@/components/ui/dialog";
 import { PriorityTaskBadge, StatusTaskBadge } from "@/components/badge";
 import useTask from "@/stores/useTask";
+import useAuth from "@/stores/useAuth";
 
 function DropdownAction({ row }: { row: Row<Task> }) {
   const task = row.original;
   const { loading, deleteTask } = useTask();
+  const { dataUser } = useAuth();
 
   return (
     <Dialog>
@@ -48,20 +50,24 @@ function DropdownAction({ row }: { row: Row<Task> }) {
               View
             </DropdownMenuItem>
           </Link>
-          <DropdownMenuSeparator />
-          <Link to={`/tasks/edit/${task.id}`}>
-            <DropdownMenuItem>
-              <PenLine />
-              Edit
-            </DropdownMenuItem>
-          </Link>
-          <DropdownMenuSeparator />
-          <DialogTrigger className="w-full">
-            <DropdownMenuItem>
-              <Trash2 />
-              Delete
-            </DropdownMenuItem>
-          </DialogTrigger>
+          {dataUser?.role === "Leader" && (
+            <>
+              <DropdownMenuSeparator />
+              <Link to={`/tasks/edit/${task.id}`}>
+                <DropdownMenuItem>
+                  <PenLine />
+                  Edit
+                </DropdownMenuItem>
+              </Link>
+              <DropdownMenuSeparator />
+              <DialogTrigger className="w-full">
+                <DropdownMenuItem>
+                  <Trash2 />
+                  Delete
+                </DropdownMenuItem>
+              </DialogTrigger>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
       <DialogContent className="w-[calc(100dvw-32px)] md:w-full rounded-lg">

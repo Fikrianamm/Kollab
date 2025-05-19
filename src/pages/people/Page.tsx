@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { columns } from "./columns";
+import { columns, columnsRoleWorker } from "./columns";
 
 import React, { useEffect } from "react";
 import {
@@ -54,9 +54,12 @@ export default function PeoplesPage() {
   const { loading, getAllPeople, peoples } = usePeople();
   const { dataUser } = useAuth();
 
+  const columnsTable =
+    dataUser?.role === "Leader" ? columns : columnsRoleWorker;
+
   const table = useReactTable({
     data: peoples || [],
-    columns,
+    columns: columnsTable,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),

@@ -220,9 +220,9 @@ function SortableItem({ id, task }: { id: UniqueIdentifier; task: Task }) {
         </h3>
         <OptionMenuTask task={task} />
       </div>
-      <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
+      <div className="mt-2 text-sm text-muted-foreground line-clamp-2">
         {parsedDesc}
-      </p>
+      </div>
     </li>
   );
 }
@@ -361,12 +361,6 @@ export default function WorkspacePage() {
 
       if (!activeItem) return prev;
 
-      // Create a new task with updated status
-      const updatedTask = {
-        ...activeItem,
-        status: overContainerId as StatusType,
-      };
-
       const newContainers = prev.map((container) => {
         if (container.id === activeContainerId) {
           return {
@@ -379,7 +373,7 @@ export default function WorkspacePage() {
           if (overId === overContainerId) {
             return {
               ...container,
-              tasks: [...container.tasks, updatedTask],
+              tasks: [...container.tasks, activeItem],
             };
           }
           const overItemIndex = container.tasks.findIndex(
@@ -390,7 +384,7 @@ export default function WorkspacePage() {
               ...container,
               tasks: [
                 ...container.tasks.slice(0, overItemIndex + 1),
-                updatedTask,
+                activeItem,
                 ...container.tasks.slice(overItemIndex + 1),
               ],
             };
@@ -403,7 +397,7 @@ export default function WorkspacePage() {
     });
   };
 
-  const handleDragEnd = async (event: DragEndEvent) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
     if (!over) {
@@ -419,7 +413,6 @@ export default function WorkspacePage() {
       return;
     }
 
-    // Handle reordering within the same container
     if (activeContainerId === overContainerId && active.id !== over.id) {
       const containerIndex = containers.findIndex(
         (c) => c.id === activeContainerId
@@ -451,30 +444,11 @@ export default function WorkspacePage() {
         });
       }
     }
-    // Handle moving between containers (update status)
-    else if (activeContainerId !== overContainerId) {
-      // Find the active task
-      const activeTask = containers
-        .find((c) => c.id === activeContainerId)
-        ?.tasks.find((t) => t.id === active.id);
 
-      if (activeTask) {
-        // Call API to update task status
-        try {
-          const result = await updateTaskStatus(
-            activeTask.id.toString(),
-            overContainerId as StatusType
-          );
-          if (!result.success) {
-            throw new Error(result.message);
-          }
-        } catch (error) {
-          console.error("Failed to update task status:", error);
-          // Reload workspace data to reset the view if the API call fails
-          getWorkspace(id as string);
-        }
-      }
-    }
+    updateTaskStatus(
+      active.id.toString() as string,
+      overContainerId.toString() as StatusType
+    );
 
     setActiveId(null);
   };
@@ -574,7 +548,7 @@ export default function WorkspacePage() {
                     <Button variant={"transparent"}>Setting</Button>
                   </Link>
                   <Dialog>
-                    <DialogTrigger className="w-full">
+                    <DialogTrigger asChild>
                       <Button variant={"transparent"} type="button">
                         Delete
                       </Button>
@@ -624,7 +598,7 @@ export default function WorkspacePage() {
               collisionDetection={closestCorners}
               sensors={sensors}
             >
-              <div className="flex gap-4 min-w-max md:min-w-0 w-full">
+              <div className="flex gap-4 min-w-max md:min-w-0">
                 {containers.map((container) => (
                   <DroppableContainer
                     key={container.id}

@@ -14,6 +14,7 @@ import { Eye, EyeOff, LoaderCircle } from "lucide-react";
 import React from "react";
 import { Link, useNavigate } from "react-router";
 import useAuth from "@/stores/useAuth";
+import Back from "@/components/back";
 
 const FormSchema = z
   .object({
@@ -171,13 +172,21 @@ export function RegisterForm() {
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? (
-              <LoaderCircle size={16} className="animate-spin" />
-            ) : (
-              "Sign Up as Leader"
-            )}
-          </Button>
+          <div className="flex flex-col gap-2">
+            <Button
+              type="submit"
+              className="w-full"
+              variant={"blue"}
+              disabled={loading}
+            >
+              {loading ? (
+                <LoaderCircle size={16} className="animate-spin" />
+              ) : (
+                "Sign Up as Leader"
+              )}
+            </Button>
+            <Back variant="button" />
+          </div>
         </div>
         <div className="mt-4 text-center text-sm text-muted-foreground">
           Member accounts can only be created by a leader inside the dashboard.

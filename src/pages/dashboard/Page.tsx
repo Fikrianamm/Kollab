@@ -34,6 +34,7 @@ import useDashboard from "@/stores/useDashboard";
 import { useEffect } from "react";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Link } from "react-router";
 
 function CardInfo(item: {
   icon: LucideIcon;
@@ -87,21 +88,23 @@ function TasksList({ tasks, priority }: { tasks: Task[]; priority: string }) {
       <div className="border border-border p-2 rounded-md flex flex-col gap-2">
         {tasks.length > 0 ? (
           tasks.map((task) => (
-            <div className="flex items-center justify-start cursor-pointer gap-2 hover:bg-muted-foreground/10 rounded-md transition-all">
-              <div
-                className={`p-2 rounded-md border bg-blue-600/10 text-blue-600 border-blue-600`}
-              >
-                <ListTodo className="w-5 h-5" />
+            <Link to={`/workspaces/${task.workspace_id}/task/${task.id}`}>
+              <div className="flex items-center justify-start cursor-pointer gap-2 hover:bg-muted-foreground/10 rounded-md transition-all">
+                <div
+                  className={`p-2 rounded-md border bg-blue-600/10 text-blue-600 border-blue-600`}
+                >
+                  <ListTodo className="w-5 h-5" />
+                </div>
+                <div className="flex flex-col">
+                  <h3 className="text-foreground text-base line-clamp-1">
+                    {task.title}
+                  </h3>
+                  <p className="text-muted-foreground text-sm">
+                    {format(task.deadline, "dd MMM yyyy")}
+                  </p>
+                </div>
               </div>
-              <div className="flex flex-col">
-                <h3 className="text-foreground text-base line-clamp-1">
-                  {task.title}
-                </h3>
-                <p className="text-muted-foreground text-sm">
-                  {format(task.deadline, "dd MMM yyyy")}
-                </p>
-              </div>
-            </div>
+            </Link>
           ))
         ) : (
           <div className="flex p-4 items-center justify-center gap-2 text-sm text-muted-foreground">
@@ -234,35 +237,35 @@ export default function DashboardPage() {
                     <Skeleton className="w-1/5 h-3" />
                     <Skeleton className="w-1/5 h-3" />
                   </div>
-                    <Skeleton className="w-full h-20" />
+                  <Skeleton className="w-full h-20" />
                 </div>
                 <div className="flex flex-col mt-4 gap-2">
                   <div className="flex justify-between items-center">
                     <Skeleton className="w-1/5 h-3" />
                     <Skeleton className="w-1/5 h-3" />
                   </div>
-                    <Skeleton className="w-full h-20" />
+                  <Skeleton className="w-full h-20" />
                 </div>
                 <div className="flex flex-col mt-4 gap-2">
                   <div className="flex justify-between items-center">
                     <Skeleton className="w-1/5 h-3" />
                     <Skeleton className="w-1/5 h-3" />
                   </div>
-                    <Skeleton className="w-full h-20" />
+                  <Skeleton className="w-full h-20" />
                 </div>
                 <div className="flex flex-col mt-4 gap-2">
                   <div className="flex justify-between items-center">
                     <Skeleton className="w-1/5 h-3" />
                     <Skeleton className="w-1/5 h-3" />
                   </div>
-                    <Skeleton className="w-full h-20" />
+                  <Skeleton className="w-full h-20" />
                 </div>
                 <div className="flex flex-col mt-4 gap-2">
                   <div className="flex justify-between items-center">
                     <Skeleton className="w-1/5 h-3" />
                     <Skeleton className="w-1/5 h-3" />
                   </div>
-                    <Skeleton className="w-full h-20" />
+                  <Skeleton className="w-full h-20" />
                 </div>
               </div>
             </div>

@@ -65,8 +65,8 @@ export default function PeoplesCreatePage() {
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     const { success } = await createPeople(data);
     if (success) {
-      navigate("/peoples");
       getAllPeople();
+      navigate("/peoples");
     }
   }
 

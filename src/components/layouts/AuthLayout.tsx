@@ -6,8 +6,19 @@ export default function AuthLayout() {
   const { theme } = useTheme();
   const logoSrc = theme === "light" ? "/LogoDark.svg" : "/LogoLight.svg";
   return (
-    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-sm">
+    <div className="relative flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+      <img
+        src="/blob.svg"
+        alt="blob"
+        className="absolute left-0 z-0 blur-3xl opacity-25 h-screen"
+      />
+      <img
+        src="/blob.svg"
+        alt="blob"
+        className="absolute right-0 z-0 blur-3xl opacity-25 h-3/5"
+      />
+
+      <div className="w-full max-w-sm z-50">
         <div className="flex flex-col gap-6">
           <img
             alt="Kollab Logo"
@@ -16,7 +27,7 @@ export default function AuthLayout() {
             height={100}
             src={logoSrc}
           />
-          <Card>
+          <Card className="bg-card/50">
             <Outlet />
           </Card>
         </div>

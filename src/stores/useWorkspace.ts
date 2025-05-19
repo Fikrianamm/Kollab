@@ -4,6 +4,7 @@ import {
   IWorkspaceData,
   Response,
   StatusType,
+  Task,
   Workspace,
 } from "@/types/types";
 import {
@@ -222,24 +223,20 @@ const useWorkspace: UseBoundStore<StoreApi<IWorkspaceStore>> = create(
       }));
     },
     updateTaskStatus: async (taskId: string, newStatus: StatusType) => {
-      // Store current workspace state for rollback if needed
       const previousWorkspace = get().workspace;
 
       try {
-        // Optimistically update the task status in the local state
         set((state) => {
           if (!state.workspace || !state.workspace.task) {
             return state;
           }
 
-          // Create updated task list with the new status
           const updatedTasks = state.workspace.task.map((task) =>
             task.id.toString() === taskId
               ? { ...task, status: newStatus }
               : task
           );
 
-          // Return updated state
           return {
             ...state,
             workspace: {
@@ -249,27 +246,20 @@ const useWorkspace: UseBoundStore<StoreApi<IWorkspaceStore>> = create(
           };
         });
 
-        // Call API to update the task status
         const { success, message } = await updateTaskStatus(newStatus, taskId);
 
         if (!success) {
           throw new Error(message);
         }
 
-        toast({
-          title: "Task Updated",
-          description: "Task status successfully updated.",
-        });
-
         return { message, success: true };
       } catch (error) {
-        // Rollback to previous state on error
         set(() => ({ workspace: previousWorkspace }));
 
         const message = getErrorMessage(error);
         toast({
           variant: "destructive",
-          title: "Update Failed",
+          title: "Oops, Something Went Wrong",
           description: message || "Failed to update task status.",
         });
 
@@ -283,6 +273,6 @@ const useWorkspace: UseBoundStore<StoreApi<IWorkspaceStore>> = create(
 const unsubscribe = useWorkspace.subscribe((state) => {
   console.log("State Workspace:", state);
 });
-void unsubscribe
+void unsubscribe;
 
 export default useWorkspace;

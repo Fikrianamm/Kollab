@@ -122,3 +122,43 @@ export const columns: ColumnDef<User>[] = [
     cell: ({ row }) => <DropdownAction row={row} />,
   },
 ];
+
+export const columnsRoleWorker: ColumnDef<User>[] = [
+  {
+    accessorKey: "name",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Name" />
+    ),
+  },
+  {
+    accessorKey: "username",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Username" />
+    ),
+  },
+  {
+    accessorKey: "email",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Email" />
+    ),
+  },
+  {
+    accessorKey: "avatar",
+    header: "Avatar",
+    cell: ({ row }) => (
+      <img
+        src={row.getValue("avatar")}
+        alt={row.getValue("name")}
+        className="w-8 h-8 md:w-10 md:h-10 rounded-full"
+      />
+    ),
+  },
+  {
+    accessorKey: "created_at",
+    header: "Created At",
+    cell: ({ row }) => {
+      const formattedDate = format(row.getValue("created_at"), "LLL dd, yyyy");
+      return <div>{formattedDate}</div>;
+    },
+  },
+];

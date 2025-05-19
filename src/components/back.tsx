@@ -1,11 +1,13 @@
 import { ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router";
+import { Button } from "./ui/button";
 
 interface BackProps {
   onClick?: () => void; // Fungsi custom saat tombol diklik
   label?: string; // Teks label tombol
   iconSize?: number; // Ukuran ikon Chevron
   fallbackPath?: string; // Path default jika tidak ada history
+  variant?: "button" | "ghost";
 }
 
 export default function Back({
@@ -13,6 +15,7 @@ export default function Back({
   label = "Back",
   iconSize = 20,
   fallbackPath = "/", // Default ke homepage jika tidak ada history
+  variant = "ghost",
 }: BackProps) {
   const navigate = useNavigate();
 
@@ -29,6 +32,19 @@ export default function Back({
       }
     }
   };
+
+  if (variant === "button") {
+    return (
+      <Button
+        variant={"outline"}
+        onClick={handleClick}
+        className="text-sm flex items-center gap-1 cursor-pointer"
+      >
+        <ChevronLeft size={iconSize} />
+        {label}
+      </Button>
+    );
+  }
 
   return (
     <button

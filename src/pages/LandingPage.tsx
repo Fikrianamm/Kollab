@@ -22,6 +22,11 @@ const LandingPage: React.FC = () => {
         alt="blob"
         className="absolute top-0 z-0 blur-3xl opacity-25 h-screen"
       />
+      <img
+        src="/blob.svg"
+        alt="blob"
+        className="absolute right-0 z-0 blur-3xl opacity-25 h-3/5"
+      />
       {/* header */}
       <div className="flex justify-between items-center w-full z-50">
         <img alt="Kollab Logo" className="w-16 md:w-20" src={logoSrc} />

@@ -14,6 +14,7 @@ import { Eye, EyeOff, LoaderCircle } from "lucide-react";
 import React, { useEffect } from "react";
 import { Link, Navigate, useNavigate } from "react-router";
 import useAuth from "@/stores/useAuth";
+import Back from "@/components/back";
 
 const FormSchema = z.object({
   email: z.string().email().nonempty(),
@@ -66,7 +67,12 @@ export function LoginForm() {
                 <FormLabel className="text-muted-foreground" htmlFor="email">
                   Email
                 </FormLabel>
-                <Input id="email" placeholder="m@example.com" {...field} autoFocus/>
+                <Input
+                  id="email"
+                  placeholder="m@example.com"
+                  {...field}
+                  autoFocus
+                />
                 <FormMessage />
               </FormItem>
             )}
@@ -99,13 +105,21 @@ export function LoginForm() {
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? (
-              <LoaderCircle size={16} className="animate-spin" />
-            ) : (
-              "Sign In"
-            )}
-          </Button>
+          <div className="flex flex-col gap-2">
+            <Button
+              type="submit"
+              className="w-full"
+              variant={"blue"}
+              disabled={loading}
+            >
+              {loading ? (
+                <LoaderCircle size={16} className="animate-spin" />
+              ) : (
+                "Sign In"
+              )}
+            </Button>
+            <Back variant="button" />
+          </div>
         </div>
         <div className="mt-4 text-center text-sm text-muted-foreground">
           Don&apos;t have an account?
