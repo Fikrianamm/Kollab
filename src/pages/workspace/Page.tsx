@@ -29,7 +29,6 @@ import {
   Eye,
   MoreHorizontal,
   PenLine,
-  Plus,
   SquareCheck,
   Trash2,
 } from "lucide-react";
@@ -228,6 +227,8 @@ function SortableItem({ id, task }: { id: UniqueIdentifier; task: Task }) {
   const completedCount =
     task?.subtask?.filter((obj) => obj.is_complete).length || 0;
   const lengthSubtask = task?.subtask?.length || 0;
+  const percentageTaskProgress: number =
+    lengthSubtask > 0 ? (completedCount / lengthSubtask) * 100 : 0;
 
   return (
     <li
@@ -271,7 +272,7 @@ function SortableItem({ id, task }: { id: UniqueIdentifier; task: Task }) {
               {(completedCount / lengthSubtask) * 100}%
             </p>
           </div>
-          <Progress className="my-2" />
+          <Progress className="my-2" value={percentageTaskProgress} />
           <p className="text-xs text-orange-600">{displayText}</p>
         </>
       ) : (
@@ -297,10 +298,6 @@ function DroppableContainer({
     <div ref={setNodeRef} className="flex flex-col min-w-[180px] md:w-full">
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-semibold text-muted-foreground">{title}</h2>
-        <Plus
-          className="text-muted-foreground hover:text-foreground hidden"
-          size={20}
-        />
       </div>
       <div className="flex-1">
         <SortableContext
@@ -594,8 +591,8 @@ export default function WorkspacePage() {
               <>
                 <WorkspaceActions />
                 <div className="items-end md:flex hidden">
-                  {/* <Link to={`/tasks/create?workspaceId=${workspace?.id}`}> */}
-                  <Link to={`/tasks/create`}>
+                  <Link to={`/tasks/create?workspaceId=${workspace?.id}`}>
+                    {/* <Link to={`/tasks/create`}> */}
                     <Button variant={"transparent"}>Create Task</Button>
                   </Link>
                   <Link to={`/workspaces/edit/${workspace?.id}`}>
